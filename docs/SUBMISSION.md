@@ -1,184 +1,118 @@
-# Submission pack — what to send, when, and exactly what to say
+# Submission
 
-> ## Read this first: the brief contains two different deadlines
-> - “**Final Submission Deadline: 15 November 2026**” (Important Deadline block)
-> - “**Submission Deadline: 15 December 2026**” (Internship Schedule table)
->
-> **Treat 15 November 2026 as the real deadline.** If everything is ready in November, the
-> December date never matters. If you need the extra month, ask in the Telegram group
-> (<https://t.me/oasisinfobyte>) and get it in writing before you rely on it.
->
-> Commencement date on the brief: 5 November 2026 — so the window between start and the earlier
-> deadline is ten days. Ship early.
+Everything that has to be in place before the form is filled in, plus what to say when
+someone asks how it works.
 
----
+## Dates
 
-## 1. Before you submit (tick every line)
+The brief carries two dates. The important deadline block says 15 November 2026. The
+schedule table says 15 December 2026. Treat 15 November as the real one and the second
+date never matters.
 
-- [ ] The repository is **public** and named **OIBSIP**: <https://github.com/Antkkorc/OIBSIP>
-- [ ] Root `README.md` renders on GitHub with the task table and the requirement map
-- [ ] Each of the five task folders has its own `README.md`
-- [ ] The five projects open and run in Android Studio on your machine (not just mine)
-- [ ] `./gradlew testDebugUnitTest` passes in each project
-- [ ] `preview/index.html` opens and every one of the five panels responds to taps
-- [ ] Folder names match `YourName_TaskNumber…` (rename if your evaluator wants the bare form)
-- [ ] You can explain every file in your own words (see “Viva” below — plagiarism is instant termination)
-- [ ] A demo video exists, 3–5 minutes, screen recording with your voice
-- [ ] Your LinkedIn profile lists the internship, and one post per milestone
+The internship starts on 5 November 2026, which leaves ten days. Work backwards from
+there and record the demo early, because a video that fails to upload on the last night
+is the usual way these submissions go wrong.
 
----
+## Checklist
 
-## 2. The submission form
+- [ ] Repository is public and named exactly `OIBSIP`
+- [ ] Root README renders, with the task table and the build steps
+- [ ] Each of the five folders has its own README
+- [ ] All five projects open and run in Android Studio on a machine that is not mine
+- [ ] `./gradlew test` passes in each of the five folders
+- [ ] `preview/index.html` opens and all five phones respond to taps
+- [ ] Folder names follow `Antonio_TaskN_Name`, matching the brief's naming rule
+- [ ] Demo video recorded, three to five minutes, with your voice
+- [ ] Form submitted through the official link, not by email
+- [ ] LinkedIn updated with the internship and one post per task
 
-The brief says **all tasks must be submitted through the official submission form only**. When it
-opens, have these ready:
+## The form
 
-| Field | What to put |
-|---|---|
+The brief says every task goes through the official submission form. Have these ready
+when it opens.
+
+| Field | Value |
+| ----- | ----- |
 | Full name | as registered with Oasis Infobyte |
-| Internship domain | Android App Development |
+| Domain | Android App Development |
 | GitHub repository | `https://github.com/Antkkorc/OIBSIP` |
-| Live demo | `https://github.com/Antkkorc/OIBSIP/blob/main/preview/index.html` — or host the `preview/` folder (GitHub Pages: Settings → Pages → Deploy from branch `main` → `/preview`) and paste that URL |
-| Tasks completed | 01 Converter, 02 Ledger, 03 Calculator, 04 Passage, 05 Chronograph |
-| Documentation | root `README.md` + `docs/STUDIO.md` + per-task READMEs |
-| Video link | unlisted YouTube / Drive link, “anyone with the link can view” |
+| Live demo | GitHub Pages for the `preview` folder, or a link to the file on GitHub |
+| Tasks completed | 01 Converter, 02 Task list, 03 Calculator, 04 Quiz, 05 Stopwatch |
+| Documentation | root README plus `docs/DESIGN.md` and the five project READMEs |
+| Video | unlisted YouTube or Drive link with view access for anyone holding it |
 
-Do **not** send repeated emails about the same issue; the Telegram group is the faster channel.
+For GitHub Pages: open Settings, then Pages, choose Deploy from a branch, pick `main`
+and the `/preview` folder. The URL will look like
+`https://antkkorc.github.io/OIBSIP/`. A static page needs no build step, so it works on
+the free tier.
 
----
+## File naming
 
-## 3. File naming
+The brief asks for `YourName_TaskNumber`. The folders are `Antonio_Task1_UnitConverter`
+through `Antonio_Task5_Stopwatch`, which keeps the required prefix and adds a word so an
+examiner knows what they are opening without clicking. If an evaluator insists on the
+bare form, rename the folders and nothing else. Nothing in the code refers to a folder
+name except the Gradle settings file, which names the module, not the folder.
 
-The brief: *“File naming format: YourName_TaskNumber.”*
+## Demo script
 
-The repository uses `Antonio_Task1_UnitConverter` … `Antonio_Task5_Stopwatch` — the required
-`Antonio_TaskN` prefix plus a descriptor, which is what most evaluators expect because it tells
-them what they are opening.
+Aim for three minutes. Record the emulator with the phone frame hidden or the device
+chrome visible, it does not matter as long as the screen is readable. Speak over it.
 
-If your evaluator insists on the literal bare form, rename the folders and nothing else:
+**0:00 to 0:20, the repository.** Show the README on GitHub, the five folders, and the
+preview page. Say what the apps are and that the design is shared.
 
-```bash
-git mv Antonio_Task1_UnitConverter Antonio_Task1
-git mv Antonio_Task2_TodoLogin      Antonio_Task2
-git mv Antonio_Task3_Calculator     Antonio_Task3
-git mv Antonio_Task4_Quiz           Antonio_Task4
-git mv Antonio_Task5_Stopwatch      Antonio_Task5
-```
+**0:20 to 0:50, converter.** Convert 250 centimetres to inches, switch to weight, then
+to temperature, then type -300 to show the absolute zero guard. Switch units with the
+swap button.
 
-Nothing in the Gradle files or the Java depends on the folder name (the Gradle project names are
-set in each `settings.gradle`). Update the table in `README.md` afterwards.
+**0:50 to 1:35, task list.** Register an account, add a task with a note, tick it off,
+filter to Done, delete it, then log out and sign in again to show the tasks returned.
+Mention PBKDF2 and per user rows while you do it.
 
----
+**1:35 to 2:00, calculator.** 12 + 7 x 3 to show precedence, then 8 / 0 to show the
+error state, then press a digit to show the recovery.
 
-## 4. Demo video script (4 minutes)
+**2:00 to 2:30, quiz.** Answer two questions, one right and one wrong, so both colours
+appear. Jump to the results screen and press Play again.
 
-Record at 1080p, phone in portrait, system bar visible. Talk while you tap — silence reads as
-"I copied this".
+**2:30 to 3:00, stopwatch.** Start, take two laps, pause, resume, then reset. Open the
+notification shade or switch apps for a few seconds and come back to show the clock
+kept counting.
 
-**0:00 – 0:25 · Opening**
-> "This is my OIBSIP Android submission: five apps built as one instrument set — converter, ledger,
-> calculator, quiz, chronograph. Java and XML throughout, SQLite for the ledger, no third-party UI
-> library. The design language is called Gutter & Rule: a numbered legend in a left gutter, ruled
-> rows, one readout anchored at the bottom."
+Close on the preview page and the test report.
 
-**0:25 – 1:10 · Converter**
-1. Type `250`, From `Centimetre`, To `Inch`, press **Convert** → `98.425197`.
-2. Tap **SWAP** → the readout re-converts without pressing Convert again.
-3. Switch to **Temp**, enter `-300` → toast: "Below absolute zero. −273.15 °C is the floor."
-4. Clear the field, press Convert → "Enter a value to convert."
-5. Type `123456789` and convert → grouping / scientific notation keeps the readout readable.
+## Questions an evaluator may ask
 
-**1:10 – 2:10 · Ledger (the biggest one)**
-1. Register: name, email, an 8-character password → lands in the empty ledger ("The ledger is
-   clean.").
-2. **Add entry** with a title and notes → appears at the top, open count `01`.
-3. Tap the row → strikethrough, marker disappears, count drops to `00`.
-4. Filter **Done** → the finished entry; filter **Open** → the empty state for that filter.
-5. Add a second entry, then **Del** → confirmation dialog → delete is permanent.
-6. **Log out** → back to the sign-in screen. Sign in again → tasks are still there.
-7. Say the security line: "Passwords are PBKDF2-HMAC-SHA256, 120,000 iterations, a fresh 16-byte
-   salt per account — the database stores a hash, never the password. Session state is in Shared
-   Preferences and cleared on logout. Every task query is scoped by user id, so two accounts on the
-   same phone cannot see each other's lists."
+**Why PBKDF2 instead of MD5?** A fast digest is cheap to brute force once the table
+leaks. PBKDF2 with a salt per account and 120,000 rounds makes each guess expensive.
+The app ships with it because the platform provides it, so it costs no dependency.
 
-**2:10 – 2:40 · Calculator**
-1. `2 + 3 × 4 =` → `14` (precedence, not left-to-right).
-2. `8 ÷ 0 =` → `ERROR` on the tape with "division by zero".
-3. `12345` then **Del** → `1,234`.
-4. Hammer ten keys fast → no crash, no double-tap.
+**How are tasks kept apart?** Every query in `TaskStore` includes `user_id = ?`, and
+the user id comes from the session, never from the UI. Signing out clears the stored id.
 
-**2:40 – 3:20 · Passage (quiz)**
-1. **Start the quiz** → "Question 01 / 12".
-2. Answer one wrong on purpose → green on the correct option, oxide on yours, note appears.
-3. **Next** → progress rule advances.
-4. Finish → scorecard: score, correct, incorrect, percentage, verdict.
-5. **Restart quiz** → a different first question (shuffled). Mention: "The deck is dealt from a
-   saved seed, so rotating the phone cannot reshuffle the exam mid-run."
+**How does the stopwatch survive a rotation?** Time is derived from
+`SystemClock.elapsedRealtime()` and saved with `SharedPreferences` on every change. The
+handler only repaints.
 
-**3:20 – 4:00 · Chronograph**
-1. **Start** → Start greys out, Stop and Lap activate, the fraction ticks in hundredths.
-2. **Lap** twice → splits with BEST/WORST tags.
-3. **Stop** → freezes; **Start** becomes **Resume**.
-4. Lock the phone for ten seconds, unlock → the clock kept running. "Elapsed time comes from
-   `SystemClock.elapsedRealtime()` and is persisted, so screen lock, backgrounding, or process death
-   cannot lose time."
-5. **Reset** → `00:00.00`, laps cleared.
+**Why a token list in the calculator?** A string can end up as `12 + + 3` after a fast
+double tap. A list cannot, because a second operator replaces the first. There is no
+parse step to crash.
 
-**Closing line:** "Design thesis and tokens are in `docs/STUDIO.md`; all conversion, parsing,
-hashing, deck and clock logic is unit-tested — 54 tests, no emulator needed."
+**Why no Compose?** The brief is Java and XML, and five apps sharing one set of
+drawables is easier to keep consistent with XML.
 
----
+**Is the design copied?** No. The token set, layouts and drawables are in this repo, and
+`docs/DESIGN.md` explains each choice.
 
-## 5. LinkedIn
+## Plagiarism
 
-The brief asks for a professional presence and milestones. One post per milestone beats one
-all-at-once post at the end.
+The brief is direct about it: copied work means termination, and marks are withheld.
+Be ready to explain any file you submit, in your own words, without the code in front of
+you. The safest test is to delete a class, rewrite it from memory, and compare.
 
-**Post 1 — day you start (screenshot: the shelf/preview page)**
-> Starting a ten-day Android build sprint with Oasis Infobyte: five apps — unit converter, a
-> to-do list with real login, a calculator, a quiz, and a stopwatch — built as one set of
-> instruments instead of five unrelated demos. Java, XML, SQLite. Repo: github.com/Antkkorc/OIBSIP
-> #OIBSIP #Android #Java
+## After submitting
 
-**Post 2 — mid-build (screenshot: the ledger with tasks)**
-> Ledger is done: SQLite with a foreign key from tasks to accounts, PBKDF2-HMAC-SHA256 password
-> hashing with a per-account salt, session cleared on logout, and an empty state that actually
-> says something. Next: calculator precedence and a quiz that cannot reshuffle itself on rotation.
-> #OIBSIP #AndroidDevelopment
-
-**Post 3 — submission (screenshot: results screen of the quiz, or the five launcher icons)**
-> Submitted my OIBSIP Android track: five apps, one design language I called Gutter & Rule —
-> numbered legends, hairlines instead of cards, one oxide accent, zero corner radius. 54 unit tests
-> on the logic that matters (conversion, parsing, hashing, scoring, timing). Thanks to @Oasis
-> Infobyte. Repo: github.com/Antkkorc/OIBSIP
-> #OIBSIP #Android #Java #OasisInfobyte
-
-Rules that keep it professional: no emojis in the first line, no "excited to share", tag the
-organisation once, attach one image, no hashtag walls.
-
----
-
-## 6. Viva: questions they will actually ask
-
-Each task README has its own Q&A. These five come up every time:
-
-1. **"Why not store the password as MD5?"** — A fast digest is a checksum, not a password hash. One
-   leaked table reverses common passwords in seconds. PBKDF2-HMAC-SHA256 with 120,000 iterations and
-   a per-account salt makes each guess cost real work, and the salt stops precomputed tables.
-2. **"Why does the calculator give 14 for 2+3×4?"** — Because the tape is a token list evaluated in
-   two passes: × and ÷ fold first, then + and −. `Evaluator.evaluate()` and its unit test.
-3. **"What happens if I rotate the phone mid-quiz?"** — `onSaveInstanceState` keeps the seed, the
-   index and the answers; the deck is re-dealt from the same seed, so the order is identical.
-4. **"How does the stopwatch survive a screen lock?"** — It never counts ticks. Elapsed time is
-   `accumulated + (elapsedRealtime() - startedAt)`; the Handler only repaints, and the three numbers
-   are persisted in Shared Preferences on every state change.
-5. **"Where is the empty state?"** — Task 2, and it changes with the filter: "The ledger is clean.",
-   "Nothing open.", "Nothing finished yet."
-
----
-
-## 7. After you press submit
-
-- Keep the repository public until the certificate is issued.
-- Don't force-push or rename the repo after submitting; the evaluator's link must keep working.
-- If the evaluator asks for an APK, build `assembleDebug` and attach it — never commit a keystore.
+Keep the repository public until the certificate is issued. An evaluator who opens a
+404 cannot mark the work. If you keep working after submission, add commits rather than
+force pushing over the submitted state.

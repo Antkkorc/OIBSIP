@@ -1,137 +1,104 @@
-# 01 · Converter — unit converter
+# 01 Unit converter
 
-**OIBSIP · Android App Development · 2026**
-Part of the [five-instrument set](../README.md). Design language: [Gutter & Rule](../docs/STUDIO.md).
-Build instructions: [BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
+Turns one unit into another across length, weight, volume and temperature. Four
+categories, twenty-six units, one screen.
 
-A single-screen converter across **26 units in 4 categories** (length, weight, volume, temperature).
-Pick a category, type a value, choose the two units, press convert. The result lands in an ink
-readout at the bottom of the screen with the conversion spelled out underneath:
-`250 CM  =  98.425197 IN  ·  via metre`.
+Part of the [OIBSIP set](../README.md). Design: [docs/DESIGN.md](../docs/DESIGN.md).
+Build: [docs/BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
 
 | | |
-|---|---|
-| Launcher label | `01 Converter` |
+| --- | --- |
+| Launcher label | Converter |
 | Package | `bw.oibsip.converter` |
-| Screen | `MainActivity` (single activity) |
-| Testable core | `ConverterEngine` (no Android imports) |
-| Tests | 13 (`ConverterEngineTest`) |
+| Screens | `MainActivity` |
+| Logic | `ConverterEngine`, no Android imports |
+| Tests | 13 in `ConverterEngineTest` |
 
-## Screen structure
+## What it does
 
-```
-OIBSIP / INSTRUMENT 01                              REV 1.0
-───────────────────────────────────────────────────────────
-Converter
-Length, weight, volume, temperature. Twenty-six units …
-  LENGTH     WEIGHT     VOLUME     TEMP            ← 4 tabs, active one carries a 2 dp rule
-  8 units · metric ↔ imperial · base: metre
-  01 / Value                        [ enter a number ]
-  ─────────────────────────────────────────────────────
-  02 / From            [ Centimetre · cm        ▾ ]
-  ─────────────────────────────────────────────────────
-  03 / To              [ Inch · in              ▾ ]
-  ─────────────────────────────────────────────────────
-                                     Swap from / to
-┌─────────────────────────────────────────────────────┐
-│ CONVERTED VALUE                                     │  ← the one dominant object
-│                                        98.425197    │
-│ ─────────────────────────────────────────────────── │
-│ 250 CM  =  98.425197 IN  ·  via metre               │
-└─────────────────────────────────────────────────────┘
-[                      CONVERT                      ]    ← the one oxide accent
-```
+The screen opens on length with centimetre to inch already selected. Four chips at the
+top switch the category, and switching clears the old answer so no stale number can be
+mistaken for a new one.
 
-## Requirements → implementation
+Two pill spinners pick the units, with a swap button between them. The value field takes
+decimals, a leading minus sign and a comma as a decimal separator, which is what a lot
+of people type on a phone.
 
-| Brief line | Implementation |
-|---|---|
-| Input field for the numeric value | `EditText inputValue`, `inputType="numberDecimal\|numberSigned"` |
-| Source unit spinner | `Spinner fromUnit`, `ArrayAdapter<String>` with custom `item_spinner_selected` / `item_spinner_dropdown` layouts (no boxed Material look) |
-| Target unit spinner | `Spinner toUnit`, same adapter instance — cheap and keeps the two lists identical |
-| Convert button | `convertButton` → `convert(true)` |
-| Result TextView with unit label | `resultValue` + `resultSentence` (`ConverterEngine.sentence`) |
-| 3+ categories | Length 8, Weight 7, Volume 8, Temperature 3 |
-| Toast on empty / non-numeric | `toast_empty`, `toast_nan` |
-| Category selector resets dropdowns | 4 tab TextViews → `selectCategory()` rebuilds both adapters and resets to index 0 → 1 |
+The result sits in a glass card at the bottom of the content, in a readout that shrinks
+when the number is long. Under it there is one plain sentence: `250 cm = 98.425197 in`.
+Long press the number to copy it.
 
-## Units and factors
+Convert is pinned to the bottom of the screen, inside thumb reach.
 
-Every non-temperature unit stores one number: its factor to the category base unit. Converting is
-`value × from.toBase ÷ to.toBase`, which is why new units are one line each and there is no
-8 × 7 table of special cases.
+## Requirements
 
-| Category | Base | Units |
-|---|---|---|
-| Length | metre | mm, cm, m, km, in (0.0254), ft (0.3048), yd (0.9144), mi (1609.344) |
-| Weight | gram | mg, g, kg, t, oz (28.349523125), lb (453.59237), st (6350.29318) |
-| Volume | litre | mL, L, m³, US gal (3.785411784), US qt, US pt, US fl oz, US cup |
-| Temperature | °C, via an explicit Celsius round-trip | °C, °F, K |
+| Brief line | Where |
+| --- | --- |
+| Three or more categories including length and weight | `ConverterEngine.Category`, four values |
+| Spinners for units | two `Spinner`s in `activity_main.xml` |
+| Switching category resets the units | `selectCategory()` rebuilds both adapters and clears the result |
+| Toast on empty input | `convert(true)` shows `toast_empty` and an inline line |
+| Toast on non numeric input | same path with `toast_nan` |
 
-Offsets (`°F`, `K`) cannot be expressed as a multiplier, so temperature is special-cased with
-`toCelsius()` / `fromCelsius()`.
+## The units
 
-## Edge cases handled
+Length has eight: millimetre, centimetre, metre, kilometre, inch, foot, yard and mile.
+Weight has seven: milligram, gram, kilogram, ounce, pound, stone and tonne. Volume has
+eight: millilitre, litre, cubic metre, teaspoon, tablespoon, fluid ounce, cup and US
+gallon. Temperature has three: Celsius, Fahrenheit and Kelvin.
 
-| Case | Behaviour |
-|---|---|
-| Empty input | Toast “Enter a value to convert.” and focus returns to the field |
-| `abc`, `1.2.3`, `1e5`, `NaN` | Rejected by a strict regex before `Double.parseDouble` — note that `parseDouble` alone accepts `1e5`, `NaN` and `Infinity` |
-| Decimal comma (`1,5`) | Read as `1.5`; a comma mixed with a dot is read as a thousands separator |
-| Value above 1 × 10¹⁵ | Refused: “Too large to convert reliably.” |
-| `-300 °C`, `-500 °F` | Refused: “Below absolute zero. −273.15 °C is the floor.” `-459.67 °F` is still accepted |
-| Results ≥ 10¹² or < 10⁻⁶ | Scientific notation, so the readout never becomes an unreadable wall of digits |
-| Long results | `AppCompatTextView` autosize 42 → 16 sp, one line |
-| Units changed after a conversion | The readout re-converts silently — it never shows a stale number |
-| Rotation | Category, both spinner positions, input and last result restored from `onSaveInstanceState` |
-| Result long-press | Copies to the clipboard (the one thing people actually want from a converter) |
+Length, weight and volume each store a factor to one base unit, the metre, the gram and
+the litre. Converting is then a multiplication and a division. Temperature cannot work
+that way because the scales have offsets, so it round trips through Celsius with three
+small functions.
 
 ## Files
 
 ```
 app/src/main/java/bw/oibsip/converter/
-├── ConverterEngine.java   units, factors, temperature, parsing, formatting (JVM-testable)
-└── MainActivity.java      tabs, spinners, validation, readout, clipboard, state
-app/src/main/res/layout/
-├── activity_main.xml
-├── item_spinner_selected.xml    right-aligned mono, no box
-└── item_spinner_dropdown.xml
-app/src/test/java/bw/oibsip/converter/ConverterEngineTest.java
+  ConverterEngine.java    unit table, parsing, conversion, formatting
+  MainActivity.java       screen wiring, validation, saved state
+  GlassUi.java            insets, press spring, content entrance
+  GlassApp.java           dark mode default
+app/src/main/res/
+  layout/activity_main.xml     header, chips, input card, result card, dock
+  layout/item_unit_selected.xml   spinner closed state
+  layout/item_unit_dropdown.xml   spinner open state
+  drawable/                glass shapes, borders, 16 icons
+  values/                  light tokens, styles, dimensions, strings
+  values-night/            dark tokens
+  font/                    five Poppins weights
+app/src/test/java/.../ConverterEngineTest.java
 ```
 
-## Run and test
+## Details worth knowing
 
-```bash
-cd Antonio_Task1_UnitConverter
-./gradlew testDebugUnitTest     # 13 tests
-./gradlew installDebug          # or press Run ▶ in Android Studio
+**Number parsing.** A comma with no dot is read as a decimal separator, so `1,5` becomes
+1.5. A comma mixed with a dot is read as a thousands separator, so `1,234.5` becomes
+1234.5. Anything else throws and the screen shows a toast.
+
+**Absolute zero.** A temperature below -273.15 °C is refused with a message that names
+the limit. The check runs before the conversion, not after, so nothing overflows the
+display.
+
+**Formatting.** Results group thousands, keep up to six decimals and switch to
+scientific notation below 1e-6 or above 1e12. The readout autosizes between 20sp and
+40sp so a long value never clips.
+
+**State.** Rotation keeps the category, both units, the typed value and the last result.
+The chip row and the dock re-enter with the same stagger they had on first launch.
+
+## Run it
+
+Open this folder in Android Studio and press Run. Or from a terminal:
+
+```
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Demo in 30 seconds
+Tests:
 
-1. Type `250`, From `Centimetre`, To `Inch` → **Convert** → `98.425197`.
-2. Tap **Swap from / to** → `250 IN = 635 CM`, no second tap on Convert.
-3. Tap **Temp**, enter `-300`, **Convert** → the absolute-zero toast.
-4. Clear the field, **Convert** → “Enter a value to convert.”
-
-## Viva
-
-**Why one factor per unit instead of a formula per pair?**
-With 8 lengths you would need 56 pair formulas; with factors you need 8 numbers and one division.
-Pair formulas also drift — the classic bug is `cm → in` dividing where it should multiply.
-
-**How does temperature fit that model?**
-It does not, so it is not forced to. `°C → °F` is `c × 9/5 + 32`, an offset plus a scale. `convert()`
-branches on the category, sends the value through Celsius, and returns from there.
-
-**Why refuse below absolute zero rather than converting it?**
-Because `-300 °C` is not a temperature. Converting it would produce a confident, wrong number, which
-is worse than a refusal. That is a domain rule, not input validation.
-
-**How do you avoid floating-point noise on screen?**
-`format()` rounds to six decimals through `DecimalFormat` with `Locale.US` fixed, strips trailing
-zeros, and switches to scientific notation at the extremes. The underlying double is never mutated.
-
-**What would you add next?**
-A searchable unit list and a “recent pairs” row, both of which need persistence the screen does not
-have yet. Also `Locale`-aware decimal separators for input rather than the current lenient parse.
+```
+./gradlew test
+```

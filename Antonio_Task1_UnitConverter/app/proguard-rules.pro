@@ -1,1 +1,1 @@
-# Gutter & Rule — no obfuscation by default (internship submission build).
+# No obfuscation for the submission build.

@@ -12,12 +12,11 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * All conversion maths lives here, with no Android imports, so it can be unit tested
- * on the JVM without an emulator.
+ * Conversion maths, with no Android imports so it can run as a JVM unit test.
  *
- * Every non-temperature unit is stored as a factor to a category base unit
- * (metre, gram, litre). Temperature is handled by an explicit Celsius round-trip
- * because scales with offsets cannot be expressed as a single multiplier.
+ * Each unit stores a factor to its category base unit (metre, gram, litre).
+ * Temperature is handled separately in Celsius because a scale with an offset
+ * cannot be written as a single multiplier.
  */
 public final class ConverterEngine {
 
@@ -178,10 +177,7 @@ public final class ConverterEngine {
         return celsius;
     }
 
-    /**
-     * True when a temperature input sits below absolute zero.
-     * A tolerance of 1e-9 keeps -459.67 °F (exactly absolute zero) valid.
-     */
+    /** True when a temperature is below absolute zero. The tolerance keeps -459.67 F valid. */
     public static boolean belowAbsoluteZero(double value, Unit from) {
         if (from.category != Category.TEMPERATURE) {
             return false;
@@ -190,10 +186,8 @@ public final class ConverterEngine {
     }
 
     /**
-     * Parses a human-typed number. A single comma without a dot is read as a decimal
-     * separator (1,5 → 1.5); commas mixed with a dot are read as thousands separators.
-     *
-     * @throws NumberFormatException when the text is empty, incomplete or not a number
+     * Parses typed input. A single comma with no dot is read as a decimal separator.
+     * Commas mixed with a dot are read as thousands separators.
      */
     public static double parseInput(String raw) {
         if (raw == null) {
@@ -214,13 +208,10 @@ public final class ConverterEngine {
         return Double.parseDouble(s);
     }
 
-    /**
-     * Instrument formatting: grouping separators, at most six decimals, and scientific
-     * notation at the extremes so the readout never becomes an unreadable wall of digits.
-     */
+    /** Grouping separators, at most six decimals, scientific notation at the extremes. */
     public static String format(double value) {
         if (Double.isNaN(value) || Double.isInfinite(value)) {
-            return "—";
+            return "Out of range";
         }
         double abs = Math.abs(value);
         if (abs < 5e-7d) {
@@ -232,9 +223,8 @@ public final class ConverterEngine {
         return PLAIN.format(value);
     }
 
-    /** e.g. "250 CM = 8.2021 FT", kept uppercase so it reads as a stamped legend. */
+    /** Builds the line under the readout, for example "250 cm = 98.4252 in". */
     public static String sentence(double input, Unit from, Unit to, String resultText) {
-        return format(input).toUpperCase(Locale.US) + " " + from.symbolUpper()
-                + "  =  " + resultText + " " + to.symbolUpper();
+        return format(input) + " " + from.symbol + " = " + resultText + " " + to.symbol;
     }
 }

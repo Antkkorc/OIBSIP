@@ -1,309 +1,371 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/paper"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:background="@drawable/bg_backdrop">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="@dimen/screen_pad"
         android:paddingTop="14dp"
-        android:paddingRight="@dimen/screen_pad">
+        android:paddingRight="@dimen/screen_pad"
+        android:paddingBottom="14dp">
 
+        <!-- header -->
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/masthead_left" />
+            <FrameLayout
+                style="@style/Widget.IconTile"
+                android:layout_width="40dp"
+                android:layout_height="40dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_calculator" />
+            </FrameLayout>
 
             <TextView
-                style="@style/Text.Legend"
+                style="@style/Text.Title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:text="@string/title" />
+
+            <TextView
+                style="@style/Text.Label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/masthead_right" />
+                android:text="@string/subtitle" />
         </LinearLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="9dp"
-            android:background="@color/ink" />
-
-        <TextView
-            style="@style/Text.Display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/title"
-            android:textSize="26sp" />
-
-        <TextView
-            style="@style/Text.Caption"
+        <!-- readout -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardReadout"
+            style="@style/Widget.GlassCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginRight="24dp"
-            android:text="@string/standfirst"
-            android:textSize="10sp" />
-    </LinearLayout>
+            android:layout_marginTop="14dp">
 
-    <!-- Readout: inverted block, numerals pushed to the right edge -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/screen_pad"
-        android:layout_marginTop="10dp"
-        android:layout_marginRight="@dimen/screen_pad"
-        android:background="@drawable/bg_readout"
-        android:orientation="vertical"
-        android:paddingLeft="18dp"
-        android:paddingTop="14dp"
-        android:paddingRight="18dp"
-        android:paddingBottom="16dp">
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
+                <View
+                    android:layout_width="240dp"
+                    android:layout_height="240dp"
+                    android:layout_gravity="end|bottom"
+                    android:layout_marginEnd="-70dp"
+                    android:layout_marginBottom="-90dp"
+                    android:background="@drawable/bg_glow" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="end"
+                    android:minHeight="152dp"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tape"
+                        style="@style/Text.Label"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="start"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:text="@string/tape_empty"
+                        android:textSize="12sp" />
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/result"
+                        style="@style/Text.Readout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:text="@string/result_zero"
+                        app:autoSizeMaxTextSize="54sp"
+                        app:autoSizeMinTextSize="30sp"
+                        app:autoSizeStepGranularity="2sp"
+                        app:autoSizeTextType="uniform" />
+                </LinearLayout>
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- keypad -->
         <LinearLayout
+            android:id="@+id/keypad"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_marginTop="6dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <TextView
-                style="@style/Text.Legend.OnInk"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/display_legend" />
+            <!-- row 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/tape"
-                style="@style/Text.Legend.OnInk"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="start"
-                android:gravity="end"
-                android:maxLines="1"
-                android:text="@string/tape_empty" />
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/result"
-            style="@style/Text.Readout.OnInk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:gravity="end"
-            android:maxLines="1"
-            android:text="@string/result_zero"
-            app:autoSizeMaxTextSize="56sp"
-            app:autoSizeMinTextSize="20sp"
-            app:autoSizeStepGranularity="2sp"
-            app:autoSizeTextType="uniform" />
-    </LinearLayout>
-
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:alignmentMode="alignMargins"
-        android:columnCount="4"
-        android:paddingLeft="12dp"
-        android:paddingTop="8dp"
-        android:paddingRight="12dp"
-        android:paddingBottom="12dp"
-        android:rowCount="5"
-        android:useDefaultMargins="false">
-
-                <Button
+                <TextView
                     android:id="@+id/keyClear"
-                    style="@style/Widget.Instrument.Key.Action"
+                    style="@style/Widget.Key.Action"
                     android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
                     android:text="@string/key_clear" />
-                <Button
-                    android:id="@+id/keySign"
-                    style="@style/Widget.Instrument.Key.Action"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_sign" />
-                <Button
-                    android:id="@+id/keyPercent"
-                    style="@style/Widget.Instrument.Key.Action"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_percent" />
-                <Button
-                    android:id="@+id/keyDivide"
-                    style="@style/Widget.Instrument.Key.Operator"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_divide" />
-                <Button
-                    android:id="@+id/key7"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_seven" />
-                <Button
-                    android:id="@+id/key8"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_eight" />
-                <Button
-                    android:id="@+id/key9"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_nine" />
-                <Button
-                    android:id="@+id/keyMultiply"
-                    style="@style/Widget.Instrument.Key.Operator"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_multiply" />
-                <Button
-                    android:id="@+id/key4"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_four" />
-                <Button
-                    android:id="@+id/key5"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_five" />
-                <Button
-                    android:id="@+id/key6"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_six" />
-                <Button
-                    android:id="@+id/keySubtract"
-                    style="@style/Widget.Instrument.Key.Operator"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_subtract" />
-                <Button
-                    android:id="@+id/key1"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_one" />
-                <Button
-                    android:id="@+id/key2"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_two" />
-                <Button
-                    android:id="@+id/key3"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_three" />
-                <Button
-                    android:id="@+id/keyAdd"
-                    style="@style/Widget.Instrument.Key.Operator"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_add" />
-                <Button
-                    android:id="@+id/key0"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_zero" />
-                <Button
-                    android:id="@+id/keyDot"
-                    style="@style/Widget.Instrument.Key"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_decimal" />
-                <Button
-                    android:id="@+id/keyDelete"
-                    style="@style/Widget.Instrument.Key.Action"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_delete" />
-                <Button
-                    android:id="@+id/keyEquals"
-                    style="@style/Widget.Instrument.Key.Equals"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_columnWeight="1"
-                    android:layout_margin="2dp"
-                    android:layout_rowWeight="1"
-                    android:text="@string/key_equals" />
-    </GridLayout>
 
-</LinearLayout>
+                <ImageButton
+                    android:id="@+id/keyDelete"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:contentDescription="@string/key_delete"
+                    android:padding="20dp"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_backspace" />
+
+                <TextView
+                    android:id="@+id/keyPercent"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_percent" />
+
+                <TextView
+                    android:id="@+id/keyDivide"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_divide"
+                    android:textColor="@color/accent_start"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <!-- row 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/key7"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="7" />
+
+                <TextView
+                    android:id="@+id/key8"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="8" />
+
+                <TextView
+                    android:id="@+id/key9"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="9" />
+
+                <TextView
+                    android:id="@+id/keyMultiply"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_multiply"
+                    android:textColor="@color/accent_start"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <!-- row 3 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/key4"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="4" />
+
+                <TextView
+                    android:id="@+id/key5"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="5" />
+
+                <TextView
+                    android:id="@+id/key6"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="6" />
+
+                <TextView
+                    android:id="@+id/keySubtract"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_minus"
+                    android:textColor="@color/accent_start"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <!-- row 4 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/key1"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="1" />
+
+                <TextView
+                    android:id="@+id/key2"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="2" />
+
+                <TextView
+                    android:id="@+id/key3"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="3" />
+
+                <TextView
+                    android:id="@+id/keyAdd"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_plus"
+                    android:textColor="@color/accent_start"
+                    android:textSize="20sp" />
+            </LinearLayout>
+
+            <!-- row 5 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/keySign"
+                    style="@style/Widget.Key.Action"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_sign" />
+
+                <TextView
+                    android:id="@+id/key0"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="0" />
+
+                <TextView
+                    android:id="@+id/keyDot"
+                    style="@style/Widget.Key"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_dot" />
+
+                <TextView
+                    android:id="@+id/keyEquals"
+                    style="@style/Widget.Key.Accent"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:text="@string/key_equals" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

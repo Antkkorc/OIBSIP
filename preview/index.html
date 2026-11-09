@@ -1,60 +1,195 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Gutter &amp; Rule — five Android instruments (OIBSIP)</title>
-<meta name="description" content="Interactive prototype of five Android apps built for the Oasis Infobyte internship: converter, ledger, calculator, quiz, chronograph." />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Five Android apps, one glass surface · OIBSIP</title>
+<meta name="description" content="Browser prototypes of five Android apps built for the Oasis Infobyte internship: unit converter, task list with login, calculator, quiz and stopwatch." />
+<meta name="color-scheme" content="dark light" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<!-- ============ left rail: the studio plate ============ -->
-<aside class="plate">
-  <div class="plate-top">
-    <span class="legend">Gutter &amp; Rule</span>
-    <span class="legend legend--faint">Rev 1.0</span>
-  </div>
-  <hr class="rule rule--ink" />
-  <h1 class="plate-title">Five<br /><em>instruments</em>.</h1>
-  <p class="caption">Five Android apps for the Oasis Infobyte internship, drawn as one set of measuring instruments. Java and XML, no third-party UI kit, no gradients, no cards.</p>
+<div class="aurora" aria-hidden="true">
+  <span class="blob blob--mint"></span>
+  <span class="blob blob--sky"></span>
+  <span class="blob blob--teal"></span>
+  <span class="grain"></span>
+</div>
 
-  <ol class="contents">
-    <li><a href="#i1"><span class="legend">01</span> Converter</a></li>
-    <li><a href="#i2"><span class="legend">02</span> Ledger</a></li>
-    <li><a href="#i3"><span class="legend">03</span> Calculator</a></li>
-    <li><a href="#i4"><span class="legend">04</span> Passage</a></li>
-    <li><a href="#i5"><span class="legend">05</span> Chronograph</a></li>
-  </ol>
+<header class="topbar">
+  <a class="brand" href="#top">
+    <span class="brand-tile" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3.5" y="3.5" width="17" height="17" rx="5"></rect>
+        <path d="M8 12.5l2.6 2.6L16 9.5"></path>
+      </svg>
+    </span>
+    <span class="brand-text">
+      <strong>OIBSIP</strong>
+      <em>Android internship</em>
+    </span>
+  </a>
 
-  <hr class="rule" />
-  <dl class="spec">
-    <div><dt class="legend">Type</dt><dd>Instrument Serif<br />IBM Plex Mono</dd></div>
-    <div><dt class="legend">Accent</dt><dd><span class="swatch"></span> Oxide #C8452B</dd></div>
-    <div><dt class="legend">Build</dt><dd>Android Studio · minSdk 26</dd></div>
-  </dl>
-  <p class="plate-foot legend legend--faint">Prototype in the browser · the shipped UI is Android XML</p>
-</aside>
+  <nav class="jump" aria-label="Apps">
+    <a href="#converter">Converter</a>
+    <a href="#tasks">Tasks</a>
+    <a href="#calculator">Calculator</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#stopwatch">Stopwatch</a>
+  </nav>
 
-<!-- ============ the shelf ============ -->
-<main class="shelf">
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch between light and dark">
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <circle cx="12" cy="12" r="4.2"></circle>
+      <path d="M12 2.6v2.2M12 19.2v2.2M4.4 4.4l1.6 1.6M18 18l1.6 1.6M2.6 12h2.2M19.2 12h2.2M4.4 19.6L6 18M18 6l1.6-1.6"></path>
+    </svg>
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 14.4A8.4 8.4 0 1 1 9.6 4a6.9 6.9 0 0 0 10.4 10.4z"></path>
+    </svg>
+  </button>
+</header>
 
-  <section class="shelf-head">
-    <p class="legend">OIBSIP / Demo sheet</p>
-    <hr class="rule rule--ink" />
-    <div class="shelf-head-row">
-      <h2>Every screen is one instrument column: legend gutter, ruled rows, one readout anchored low. Nothing centred, nothing floating.</h2>
-      <p class="caption">These five panels are live prototypes of the Android screens in <code>Antonio_Task1…5</code>. Type in them, tap them, break them. Each one lists the edge cases it handles underneath.</p>
-    </div>
+<main id="top">
+
+  <section class="hero">
+    <p class="eyebrow"><span class="pulse"></span> Oasis Infobyte · tasks 1 to 5</p>
+    <h1>Five Android apps,<br /><span class="grad">one glass surface.</span></h1>
+    <p class="lede">
+      Everything below runs in the browser, but the layout, colours and timing are the same
+      ones in the Android source. Tap a chip, type a number, finish a quiz. Each phone is a
+      working copy of a screen that ships in this repository.
+    </p>
+    <ul class="spec-chips">
+      <li>Java + XML</li>
+      <li>minSdk 26</li>
+      <li>54 unit tests</li>
+      <li>No UI kit</li>
+    </ul>
+    <p class="hint">Tip: the button in the top right switches the whole page, apps included, to the light palette.</p>
   </section>
 
-  <div class="grid" data-shelf></div>
+  <section class="stage" id="converter" data-reveal>
+    <div class="stage-copy">
+      <p class="eyebrow">Task 01</p>
+      <h2>Unit converter</h2>
+      <p>
+        Four categories, twenty-six units. Length, weight, volume and temperature all sit
+        behind the same two spinners, so switching category swaps the unit lists and clears
+        the old answer instead of leaving a stale number on screen.
+      </p>
+      <ul class="notes">
+        <li>Empty or non-numeric input shows a toast and a line under the result.</li>
+        <li>Commas work as decimals, and a value below absolute zero is refused.</li>
+        <li>Long press the result on Android to copy it.</li>
+      </ul>
+    </div>
+    <div class="phone" data-app="converter" aria-label="Unit converter prototype"></div>
+  </section>
 
-  <footer class="colophon">
-    <hr class="rule rule--ink" />
-    <p class="legend">Gutter &amp; Rule · OIBSIP 2026 · Java + XML · 0 dp corner radius · 0 dp elevation</p>
-  </footer>
+  <section class="stage stage--flip" id="tasks" data-reveal>
+    <div class="stage-copy">
+      <p class="eyebrow">Task 02</p>
+      <h2>Task list with login</h2>
+      <p>
+        Register, sign in, and every task you add belongs to that account only. Passwords
+        are stored as PBKDF2-HMAC-SHA256 with a per-user salt, not as text. Logging out
+        clears the session, so the next person to open the app sees the sign-in screen.
+      </p>
+      <ul class="notes">
+        <li>Tick a task to strike it through. Delete asks first.</li>
+        <li>Filters for all, open and done, plus a count line up top.</li>
+        <li>This copy keeps accounts in memory while the page is open.</li>
+      </ul>
+    </div>
+    <div class="phone" data-app="tasks" aria-label="Task list prototype"></div>
+  </section>
+
+  <section class="stage" id="calculator" data-reveal>
+    <div class="stage-copy">
+      <p class="eyebrow">Task 03</p>
+      <h2>Calculator</h2>
+      <p>
+        The tape is a list of numbers and operators, not a raw string, so fast or repeated
+        taps can only build a valid expression. A second operator replaces the first, and
+        the equals key never sees a trailing one.
+      </p>
+      <ul class="notes">
+        <li>Multiplication and division before addition and subtraction.</li>
+        <li>Divide by zero prints Error, and the next key starts clean.</li>
+        <li>Results group by thousands and switch to scientific notation at the extremes.</li>
+      </ul>
+    </div>
+    <div class="phone" data-app="calculator" aria-label="Calculator prototype"></div>
+  </section>
+
+  <section class="stage stage--flip" id="quiz" data-reveal>
+    <div class="stage-copy">
+      <p class="eyebrow">Task 04</p>
+      <h2>Quiz</h2>
+      <p>
+        Ten questions from a larger bank, dealt in a new order each run. The first tap
+        locks your answer: the right option turns green, a wrong pick turns red, and the
+        note underneath explains it before you move on.
+      </p>
+      <ul class="notes">
+        <li>Progress bar, question counter and a running score.</li>
+        <li>Results screen counts correct, incorrect and accuracy, then deals again.</li>
+        <li>Rotating the phone keeps your place, not your streak.</li>
+      </ul>
+    </div>
+    <div class="phone" data-app="quiz" aria-label="Quiz prototype"></div>
+  </section>
+
+  <section class="stage" id="stopwatch" data-reveal>
+    <div class="stage-copy">
+      <p class="eyebrow">Task 05</p>
+      <h2>Stopwatch</h2>
+      <p>
+        Hundredths, built on the device clock rather than a counter, so the time is right
+        after a pause, a rotation or an hour in the background. Laps record splits and mark
+        the fastest and slowest of the run.
+      </p>
+      <ul class="notes">
+        <li>Start, pause, resume and reset, each dimming when it has nothing to do.</li>
+        <li>Laps list keeps the newest at the top.</li>
+        <li>The screen stays awake while the clock runs.</li>
+      </ul>
+    </div>
+    <div class="phone" data-app="stopwatch" aria-label="Stopwatch prototype"></div>
+  </section>
+
+  <section class="closing" data-reveal>
+    <div class="closing-card glass">
+      <h2>Build any of them</h2>
+      <p>
+        Open the project folder in Android Studio, let Gradle sync, and press Run. Each
+        folder is a standalone app with its own README, and the step by step version with
+        the exact paste points is in <code>docs/BUILD_AND_RUN.md</code>.
+      </p>
+      <div class="closing-grid">
+        <div>
+          <p class="label">Tool</p>
+          <p>Android Studio Hedgehog or newer</p>
+        </div>
+        <div>
+          <p class="label">Compile</p>
+          <p>SDK 34, Java 17</p>
+        </div>
+        <div>
+          <p class="label">Tests</p>
+          <p>Right click <code>app/src/test</code>, run</p>
+        </div>
+      </div>
+      <a class="pill pill--primary" href="https://github.com/Antkkorc/OIBSIP">Open the repository</a>
+    </div>
+  </section>
 </main>
+
+<footer class="footer">
+  <p>OIBSIP 2026 · built by Antonio · Java, XML, one gradient</p>
+  <p class="footer-faint">Prototypes run in the browser. The shipped screens are Android XML.</p>
+</footer>
 
 <script src="apps.js"></script>
 </body>

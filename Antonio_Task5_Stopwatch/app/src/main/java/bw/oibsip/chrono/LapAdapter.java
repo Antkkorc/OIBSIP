@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * Lap ledger. Rows are handed in newest first; BEST and WORST tags are recomputed on
- * every update, because a new lap can take either title away from an older one.
+ * Lap rows, newest first. The fastest and slowest tags are recomputed on every update
+ * because a new lap can take either title from an older one.
  */
 public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapHolder> {
 
@@ -64,17 +64,17 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapHolder> {
         }
 
         void bind(Lap lap, boolean best, boolean worst) {
-            number.setText(String.format(Locale.US, "L%02d", lap.number));
+            number.setText(String.format(Locale.US, "L%d", lap.number));
             split.setText(ChronoFormat.full(lap.split));
             total.setText(ChronoFormat.full(lap.total));
 
             if (best) {
                 tag.setVisibility(View.VISIBLE);
-                tag.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.moss));
+                tag.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.success));
                 tag.setText(R.string.best);
             } else if (worst) {
                 tag.setVisibility(View.VISIBLE);
-                tag.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.oxide));
+                tag.setTextColor(ContextCompat.getColor(itemView.getContext(), R.color.error));
                 tag.setText(R.string.worst);
             } else {
                 tag.setVisibility(View.INVISIBLE);

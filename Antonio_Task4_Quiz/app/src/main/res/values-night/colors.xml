@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark theme is the default look. Light theme lives in values/colors.xml with the same names. -->
+    <color name="bg_base">#070B12</color>
+    <color name="bg_base_alt">#0B1220</color>
+
+    <color name="glass_fill">#1AFFFFFF</color>
+    <color name="glass_fill_strong">#26FFFFFF</color>
+    <color name="glass_top">#33FFFFFF</color>
+    <color name="glass_bottom">#0FFFFFFF</color>
+    <color name="glass_border">#33FFFFFF</color>
+    <color name="glass_highlight">#59FFFFFF</color>
+    <color name="row_press">#14FFFFFF</color>
+
+    <color name="text_primary">#F4F8F7</color>
+    <color name="text_secondary">#A7B8BE</color>
+    <color name="text_tertiary">#6F828B</color>
+
+    <color name="accent_start">#6EF2C0</color>
+    <color name="accent_end">#37B6FF</color>
+    <color name="on_accent">#05110E</color>
+    <color name="accent_soft">#336EF2C0</color>
+    <color name="accent_line">#806EF2C0</color>
+
+    <color name="success">#63E6A0</color>
+    <color name="success_fill">#2663E6A0</color>
+    <color name="error_fill">#26FF8A7A</color>
+    <color name="error">#FF8A7A</color>
+
+    <color name="field_fill">#14FFFFFF</color>
+    <color name="dialog_bg">#F20B1220</color>
+    <color name="shadow_glow">#406EF2C0</color>
+    <color name="scrim">#B3070B12</color>
+    <color name="divider">#1FFFFFFF</color>
+</resources>

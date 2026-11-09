@@ -2,51 +2,41 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/bg_row"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingLeft="14dp"
+    android:paddingTop="13dp"
+    android:paddingRight="14dp"
+    android:paddingBottom="13dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/lapNumber"
+        style="@style/Text.Label"
+        android:layout_width="44dp"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="44dp"
-        android:orientation="horizontal">
+        android:textColor="@color/accent_start"
+        android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/lapNumber"
-            style="@style/Text.Legend"
-            android:layout_width="52dp"
-            android:layout_height="wrap_content"
-            android:textSize="10sp" />
+    <TextView
+        android:id="@+id/lapSplit"
+        style="@style/Text.Value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
-        <TextView
-            android:id="@+id/lapSplit"
-            style="@style/Text.Value"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:textSize="15sp" />
+    <TextView
+        android:id="@+id/lapTag"
+        style="@style/Text.Label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp" />
 
-        <TextView
-            android:id="@+id/lapTag"
-            style="@style/Text.Legend.Moss"
-            android:layout_width="46dp"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:visibility="invisible" />
-
-        <TextView
-            android:id="@+id/lapTotal"
-            style="@style/Text.Value"
-            android:layout_width="96dp"
-            android:layout_height="wrap_content"
-            android:gravity="end"
-            android:textColor="@color/ink_muted"
-            android:textSize="13sp" />
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/rule" />
+    <TextView
+        android:id="@+id/lapTotal"
+        style="@style/Text.Value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/text_tertiary" />
 </LinearLayout>

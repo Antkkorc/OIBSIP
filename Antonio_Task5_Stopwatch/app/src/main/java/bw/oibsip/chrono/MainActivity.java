@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Instrument 05 — Chronograph.
- *
- * Elapsed time is derived from SystemClock.elapsedRealtime() and persisted on every
- * state change, so leaving the screen, locking the phone, or losing the process cannot
- * lose time. The Handler only repaints: it is never the source of truth.
+ * Stopwatch screen. Elapsed time comes from SystemClock.elapsedRealtime() and is saved
+ * on every state change, so leaving the screen, locking the phone or losing the process
+ * cannot lose time. The Handler only repaints; it is never the source of truth.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        GlassUi.install(this, R.layout.activity_main);
 
         stopwatch = new Stopwatch(new Stopwatch.Ticker() {
             @Override
@@ -117,6 +115,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        GlassUi.pressAll(startButton, stopButton, lapButton, resetButton);
+
+        GlassUi.enter(findViewById(R.id.header), 0L);
+        GlassUi.enter(findViewById(R.id.cardReadout), 70L);
+        GlassUi.enter(findViewById(R.id.lapHeader), 130L);
+        GlassUi.enter(findViewById(R.id.dock), 190L);
+
         restore();
         renderAll();
     }
@@ -158,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
         lapTotals.add(stopwatch.elapsed());
         persist();
         renderLaps();
+        GlassUi.refresh(lapCount);
     }
 
     // ---------------------------------------------------------------- rendering
@@ -179,9 +185,13 @@ public class MainActivity extends AppCompatActivity {
         readout.setSpan(new RelativeSizeSpan(0.42f), start, readout.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         readout.setSpan(new ForegroundColorSpan(
-                        ContextCompat.getColor(this, R.color.paper_on_ink_muted)),
+                        ContextCompat.getColor(this, R.color.text_tertiary)),
                 start, readout.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        boolean sameLength = timeDisplay.length() == readout.length();
         timeDisplay.setText(readout);
+        if (!sameLength) {
+            GlassUi.refresh(timeDisplay);
+        }
 
         stateLabel.setText(stopwatch.isRunning()
                 ? R.string.state_running
@@ -192,7 +202,8 @@ public class MainActivity extends AppCompatActivity {
         List<Lap> chronological = Lap.build(lapTotals);
         adapter.setLaps(Lap.newestFirst(chronological));
 
-        lapCount.setText(getString(R.string.laps_count, lapTotals.size()));
+        lapCount.setText(getResources().getQuantityString(
+                R.plurals.laps_count, lapTotals.size(), lapTotals.size()));
         emptyLaps.setVisibility(lapTotals.isEmpty() ? View.VISIBLE : View.GONE);
 
         if (chronological.isEmpty()) {
@@ -204,17 +215,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /** Every control dims when it has nothing to do, so the next tap is obvious. */
     private void updateControls() {
         boolean running = stopwatch.isRunning();
         long elapsed = stopwatch.elapsed();
 
         startButton.setEnabled(!running);
+        startButton.setAlpha(running ? 0.35f : 1f);
         startButton.setText(elapsed > 0L ? R.string.resume : R.string.start);
         stopButton.setEnabled(running);
+        stopButton.setAlpha(running ? 1f : 0.35f);
         lapButton.setEnabled(running);
+        lapButton.setAlpha(running ? 1f : 0.35f);
         resetButton.setEnabled(elapsed > 0L || !lapTotals.isEmpty());
+        resetButton.setAlpha(resetButton.isEnabled() ? 1f : 0.35f);
 
         runDot.setVisibility(running ? View.VISIBLE : View.INVISIBLE);
+        if (running) {
+            runDot.animate().cancel();
+            runDot.setAlpha(1f);
+            runDot.animate().alpha(0.35f).setDuration(600).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    if (runDot.getVisibility() == View.VISIBLE) {
+                        runDot.animate().alpha(1f).setDuration(600).start();
+                    }
+                }
+            }).start();
+        }
     }
 
     private void updateKeepScreenOn() {

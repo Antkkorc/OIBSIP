@@ -1,4 +1,4 @@
-// Gutter & Rule — top-level build file.
+// Top level build file for this app.
 plugins {
     id 'com.android.application' version '8.6.1' apply false
 }

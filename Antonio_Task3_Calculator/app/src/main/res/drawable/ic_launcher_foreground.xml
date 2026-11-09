@@ -4,9 +4,15 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="@color/ink" android:pathData="M24,30 h2.4 v54 h-2.4 z" />
-    <path android:fillColor="@color/ink" android:pathData="M42,30 h2.4 v54 h-2.4 z" />
-    <path android:fillColor="@color/ink" android:pathData="M60,30 h2.4 v54 h-2.4 z" />
-    <path android:fillColor="@color/ink" android:pathData="M78,30 h2.4 v54 h-2.4 z" />
-    <path android:fillColor="@color/oxide" android:pathData="M24,70 h56.4 v10 h-56.4 z" />
+    <group android:translateX="30" android:translateY="30" android:scaleX="2" android:scaleY="2">
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M6 3h12v18H6z" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M9 7h6" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M9.5 11.5h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M12 11.5h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M14.5 11.5h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M9.5 15h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M12 15h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M14.5 15h.01" />
+        <path android:strokeColor="@color/on_accent" android:strokeWidth="1.6" android:strokeLineCap="round" android:strokeLineJoin="round" android:fillColor="#00000000" android:pathData="M9 18h6" />
+    </group>
 </vector>

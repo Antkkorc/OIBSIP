@@ -1,199 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/paper"
-    android:fillViewport="true"
-    android:fitsSystemWindows="true"
-    android:scrollbars="none">
+    android:background="@drawable/bg_backdrop">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="@dimen/screen_pad"
-        android:paddingTop="14dp"
+        android:paddingTop="24dp"
         android:paddingRight="@dimen/screen_pad"
-        android:paddingBottom="16dp">
+        android:paddingBottom="22dp">
 
-        <LinearLayout
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="0dp"
+            android:layout_weight="1" />
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/masthead_left" />
+        <FrameLayout
+            android:id="@+id/heroTile"
+            style="@style/Widget.IconTile"
+            android:layout_width="64dp"
+            android:layout_height="64dp">
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/masthead_right" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="9dp"
-            android:background="@color/ink" />
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_quiz" />
+        </FrameLayout>
 
         <TextView
             style="@style/Text.Display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="30dp"
-            android:text="@string/welcome_title"
-            android:textSize="44sp" />
+            android:layout_marginTop="20dp"
+            android:text="@string/welcome_title" />
 
         <TextView
-            style="@style/Text.Caption"
+            style="@style/Text.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginRight="12dp"
-            android:text="@string/welcome_standfirst"
-            android:textSize="12sp" />
+            android:layout_marginTop="8dp"
+            android:text="@string/welcome_body" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="28dp"
-            android:background="@color/ink" />
-
-        <LinearLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/factsCard"
+            style="@style/Widget.GlassCard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="@dimen/row_min"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_marginTop="24dp">
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="@dimen/gutter"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/spec_questions_label" />
+                android:orientation="vertical"
+                android:padding="18dp">
 
-            <TextView
-                style="@style/Text.Value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/spec_questions_value" />
-        </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_check" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/row_min"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+                    <TextView
+                        style="@style/Text.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/welcome_row_questions" />
+                </LinearLayout>
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="@dimen/gutter"
-                android:layout_height="wrap_content"
-                android:text="@string/spec_order_label" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            <TextView
-                style="@style/Text.Value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/spec_order_value"
-                android:textSize="14sp" />
-        </LinearLayout>
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_swap" />
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
+                    <TextView
+                        style="@style/Text.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/welcome_row_choices" />
+                </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/row_min"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="14dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="@dimen/gutter"
-                android:layout_height="wrap_content"
-                android:text="@string/spec_scoring_label" />
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_restart" />
 
-            <TextView
-                style="@style/Text.Value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/spec_scoring_value"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="@dimen/row_min"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="@dimen/gutter"
-                android:layout_height="wrap_content"
-                android:text="@string/spec_topic_label" />
-
-            <TextView
-                style="@style/Text.Value"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/spec_topic_value"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/ink" />
+                    <TextView
+                        style="@style/Text.Value"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="@string/welcome_row_feedback" />
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"
-            android:minHeight="30dp" />
+            android:layout_weight="1" />
 
         <Button
             android:id="@+id/startButton"
-            style="@style/Widget.Instrument.Button.Primary"
+            style="@style/Widget.Pill.Primary"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_height"
+            android:layout_height="58dp"
             android:text="@string/start" />
 
         <TextView
-            style="@style/Text.Legend"
+            style="@style/Text.Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:letterSpacing="0.08"
-            android:text="@string/welcome_colophon" />
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:text="@string/welcome_footnote" />
     </LinearLayout>
-</ScrollView>
+</FrameLayout>

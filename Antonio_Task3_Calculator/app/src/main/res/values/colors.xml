@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Gutter & Rule palette. Identical in all five instruments. -->
 <resources>
-    <color name="paper">#F3F0E9</color>
-    <color name="paper_shade">#E7E2D4</color>
-    <color name="ink">#17160F</color>
-    <color name="ink_muted">#6F6C60</color>
-    <color name="ink_faint">#A9A496</color>
-    <color name="rule">#D8D2C2</color>
-    <color name="rule_dark">#3A382E</color>
-    <color name="oxide">#C8452B</color>
-    <color name="oxide_press">#A2341D</color>
-    <color name="oxide_tint">#F1DAD3</color>
-    <color name="moss">#2E6B4E</color>
-    <color name="moss_tint">#DDE7DE</color>
-    <color name="paper_on_ink">#F3F0E9</color>
-    <color name="paper_on_ink_muted">#A8A493</color>
-    <color name="disabled">#C9C3B3</color>
-    <color name="icon_bg">#F3F0E9</color>
+    <!-- Light theme uses the same token names, inverted. Dark theme lives in values-night/colors.xml. -->
+    <color name="bg_base">#EDF2F1</color>
+    <color name="bg_base_alt">#E6EDF0</color>
+
+    <color name="glass_fill">#D9FFFFFF</color>
+    <color name="glass_fill_strong">#F2FFFFFF</color>
+    <color name="glass_top">#FFFFFFFF</color>
+    <color name="glass_bottom">#E6FFFFFF</color>
+    <color name="glass_border">#CCFFFFFF</color>
+    <color name="glass_highlight">#FFFFFFFF</color>
+    <color name="row_press">#140B1220</color>
+
+    <color name="text_primary">#0A1418</color>
+    <color name="text_secondary">#46595F</color>
+    <color name="text_tertiary">#6E8288</color>
+
+    <color name="accent_start">#2FBF8F</color>
+    <color name="accent_end">#1E8FD6</color>
+    <color name="on_accent">#04110E</color>
+    <color name="accent_soft">#332FBF8F</color>
+    <color name="accent_line">#802FBF8F</color>
+
+    <color name="success">#1F7A4D</color>
+    <color name="success_fill">#332FBF8F</color>
+    <color name="error_fill">#33C6462F</color>
+    <color name="error">#C6462F</color>
+
+    <color name="field_fill">#B3FFFFFF</color>
+    <color name="dialog_bg">#FAFFFFFF</color>
+    <color name="shadow_glow">#332FBF8F</color>
+    <color name="scrim">#590A1418</color>
+    <color name="divider">#140B1220</color>
 </resources>
