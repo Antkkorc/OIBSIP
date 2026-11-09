@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">03 Calculator</string>
+
+    <string name="masthead_left">OIBSIP / INSTRUMENT 03</string>
+    <string name="masthead_right">REV 1.0</string>
+    <string name="title">Calculator</string>
+    <string name="standfirst">Four functions, twenty keys. No history, no tape to scroll, nothing saved when you leave.</string>
+
+    <string name="display_legend">03 / Display</string>
+    <string name="tape_empty">New tape</string>
+    <string name="result_zero">0</string>
+    <string name="error_text">Error</string>
+
+    <string name="key_clear">AC</string>
+    <string name="key_sign">±</string>
+    <string name="key_percent">%</string>
+    <string name="key_divide">÷</string>
+    <string name="key_multiply">×</string>
+    <string name="key_subtract">−</string>
+    <string name="key_add">+</string>
+    <string name="key_equals">=</string>
+    <string name="key_delete">Del</string>
+    <string name="key_decimal">.</string>
+    <string name="key_zero">0</string>
+    <string name="key_one">1</string>
+    <string name="key_two">2</string>
+    <string name="key_three">3</string>
+    <string name="key_four">4</string>
+    <string name="key_five">5</string>
+    <string name="key_six">6</string>
+    <string name="key_seven">7</string>
+    <string name="key_eight">8</string>
+    <string name="key_nine">9</string>
+
+    <string name="error_divide_by_zero">Division by zero · the tape stops here</string>
+    <string name="error_overflow">Out of range · clear to start again</string>
+</resources>

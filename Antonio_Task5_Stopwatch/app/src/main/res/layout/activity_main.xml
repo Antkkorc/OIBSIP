@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/paper"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingTop="14dp"
+        android:paddingRight="@dimen/screen_pad">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/masthead_left" />
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/masthead_right" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="9dp"
+            android:background="@color/ink" />
+
+        <TextView
+            style="@style/Text.Display"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/title"
+            android:textSize="26sp" />
+
+        <TextView
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginRight="20dp"
+            android:text="@string/standfirst"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+    <!-- Readout: the dominant object in the app -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/screen_pad"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="@dimen/screen_pad"
+        android:background="@drawable/bg_readout"
+        android:orientation="vertical"
+        android:paddingLeft="18dp"
+        android:paddingTop="14dp"
+        android:paddingRight="18dp"
+        android:paddingBottom="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Legend.OnInk"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/elapsed_legend" />
+
+            <View
+                android:id="@+id/runDot"
+                android:layout_width="7dp"
+                android:layout_height="7dp"
+                android:layout_gravity="center_vertical"
+                android:background="@color/oxide"
+                android:visibility="invisible" />
+
+            <TextView
+                android:id="@+id/stateLabel"
+                style="@style/Text.Legend.OnInk"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:text="@string/state_idle" />
+        </LinearLayout>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/timeDisplay"
+            style="@style/Text.Readout.OnInk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:maxLines="1"
+            android:text="00:00.00"
+            app:autoSizeMaxTextSize="66sp"
+            app:autoSizeMinTextSize="26sp"
+            app:autoSizeStepGranularity="2sp"
+            app:autoSizeTextType="uniform" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/rule_dark" />
+
+        <TextView
+            android:id="@+id/lastLap"
+            style="@style/Text.Caption.OnInk"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/last_lap_none" />
+    </LinearLayout>
+
+    <!-- Lap ledger -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingTop="16dp"
+        android:paddingRight="@dimen/screen_pad">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/laps_label" />
+
+            <TextView
+                android:id="@+id/lapCount"
+                style="@style/Text.Legend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0 recorded" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="7dp"
+            android:background="@color/ink" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="7dp"
+            android:paddingBottom="7dp">
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:text="@string/column_index" />
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="@string/column_split" />
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="96dp"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:text="@string/column_total" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rule" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/lapList"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="6dp"
+                android:scrollbars="none" />
+
+            <LinearLayout
+                android:id="@+id/emptyLaps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="20dp"
+                android:paddingRight="30dp">
+
+                <TextView
+                    style="@style/Text.Display.Italic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/empty_laps_title"
+                    android:textSize="22sp" />
+
+                <TextView
+                    style="@style/Text.Caption"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/empty_laps_hint" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- Controls: 2x2, every key 54dp so a thumb finds it without looking -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingTop="8dp"
+        android:paddingRight="@dimen/screen_pad"
+        android:paddingBottom="14dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/startButton"
+                style="@style/Widget.Instrument.Button.Primary"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_height"
+                android:layout_weight="1"
+                android:text="@string/start" />
+
+            <Button
+                android:id="@+id/stopButton"
+                style="@style/Widget.Instrument.Button.Ink"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_height"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:text="@string/stop" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/lapButton"
+                style="@style/Widget.Instrument.Button.Ghost"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_height"
+                android:layout_weight="1"
+                android:text="@string/lap" />
+
+            <Button
+                android:id="@+id/resetButton"
+                style="@style/Widget.Instrument.Button.Ghost"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/action_height"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:text="@string/reset" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

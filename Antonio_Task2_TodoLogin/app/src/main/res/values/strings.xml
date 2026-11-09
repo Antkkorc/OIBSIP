@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">02 Ledger</string>
+
+    <string name="masthead_left">OIBSIP / INSTRUMENT 02</string>
+    <string name="masthead_right">REV 1.0</string>
+
+    <!-- Sign in -->
+    <string name="login_title">The Ledger</string>
+    <string name="login_standfirst">One account, one list, kept on this device. Sign in to pick up where you stopped.</string>
+    <string name="label_email">01 / Email</string>
+    <string name="label_password">02 / Password</string>
+    <string name="hint_email">you@example.com</string>
+    <string name="hint_password">your password</string>
+    <string name="hint_new_password">at least 8 characters</string>
+    <string name="sign_in">Sign in</string>
+    <string name="to_register">No account? Register</string>
+    <string name="login_colophon">PBKDF2-SHA256 · 120,000 ITERATIONS · ONE SALT PER ACCOUNT · SESSION IN SHARED PREFERENCES</string>
+
+    <!-- Register -->
+    <string name="register_title">Open an account</string>
+    <string name="register_standfirst">Your name and email live in this app\'s SQLite database. The password is salted and hashed before it is stored, never written as text.</string>
+    <string name="label_name">01 / Name</string>
+    <string name="hint_name">what should the page say</string>
+    <string name="create_account">Create account</string>
+    <string name="to_login">Already registered? Sign in</string>
+    <string name="register_colophon">SALTED + HASHED · NOTHING LEAVES THIS PHONE · NO NETWORK PERMISSION</string>
+
+    <!-- Ledger -->
+    <string name="tasks_title">The Ledger</string>
+    <string name="tasks_standfirst">Tasks are keyed to your account and stored in SQLite on this phone.</string>
+    <string name="signed_in_as">Signed in as</string>
+    <string name="log_out">Log out</string>
+    <string name="count_open">Open</string>
+    <string name="count_done">Done</string>
+    <string name="filter_all">All</string>
+    <string name="filter_open">Open</string>
+    <string name="filter_done">Done</string>
+    <string name="add_entry">Add entry</string>
+    <string name="del">Del</string>
+
+    <!-- Empty states -->
+    <string name="empty_all_title">The ledger is clean.</string>
+    <string name="empty_all_hint">Add the first entry. It stays on this phone.</string>
+    <string name="empty_open_title">Nothing open.</string>
+    <string name="empty_open_hint">Every entry on the page is struck through.</string>
+    <string name="empty_done_title">Nothing finished yet.</string>
+    <string name="empty_done_hint">Tap an entry to strike it through.</string>
+
+    <!-- Add dialog -->
+    <string name="dialog_legend">OIBSIP / LEDGER / NEW ENTRY</string>
+    <string name="dialog_title">Add an entry</string>
+    <string name="dialog_label_title">01 / Task</string>
+    <string name="hint_task">What needs doing?</string>
+    <string name="dialog_label_notes">02 / Notes (optional)</string>
+    <string name="hint_notes">Context, a link, a deadline</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+
+    <!-- Delete confirm -->
+    <string name="confirm_legend">OIBSIP / LEDGER / DELETE</string>
+    <string name="confirm_title">Delete this entry?</string>
+    <string name="confirm_body">This is permanent. There is no archive, and no undo.</string>
+    <string name="delete">Delete</string>
+
+    <!-- Errors and toasts -->
+    <string name="error_login_empty">Both fields are required.</string>
+    <string name="error_login_failed">No account matches that email and password.</string>
+    <string name="error_name">Enter the name you want on the account.</string>
+    <string name="error_email">That address is missing an @ or a domain.</string>
+    <string name="error_password">Use at least 8 characters. Longer is better than clever.</string>
+    <string name="error_email_taken">An account already exists for that email.</string>
+    <string name="error_task_title">An entry needs a title.</string>
+    <string name="error_session">That session has expired. Sign in again.</string>
+
+    <string name="stamp_added">Added</string>
+    <string name="stamp_done">Done</string>
+</resources>

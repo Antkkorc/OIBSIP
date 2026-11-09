@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.Instrument" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/paper</item>
+        <item name="android:statusBarColor">@color/paper</item>
+        <item name="android:navigationBarColor">@color/paper</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:textColorPrimary">@color/ink</item>
+        <item name="android:textColorSecondary">@color/ink_muted</item>
+        <item name="android:colorAccent">@color/oxide</item>
+        <item name="colorAccent">@color/oxide</item>
+        <item name="android:fontFamily">@font/plex_mono</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+    <!-- ============ Signature 1: engraved legend ============ -->
+    <style name="Text.Legend">
+        <item name="android:fontFamily">@font/plex_mono</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.16</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:lineSpacingMultiplier">1.35</item>
+    </style>
+    <style name="Text.Legend.OnInk">
+        <item name="android:textColor">@color/paper_on_ink_muted</item>
+    </style>
+    <style name="Text.Legend.Oxide">
+        <item name="android:textColor">@color/oxide</item>
+    </style>
+    <style name="Text.Legend.Moss">
+        <item name="android:textColor">@color/moss</item>
+    </style>
+
+    <style name="Text.Display">
+        <item name="android:fontFamily">@font/instrument_serif</item>
+        <item name="android:textSize">34sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:lineSpacingMultiplier">0.95</item>
+    </style>
+    <style name="Text.Display.Italic">
+        <item name="android:fontFamily">@font/instrument_serif_italic</item>
+    </style>
+
+    <style name="Text.Caption">
+        <item name="android:fontFamily">@font/plex_mono</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:textColor">@color/ink_muted</item>
+        <item name="android:lineSpacingMultiplier">1.45</item>
+    </style>
+    <style name="Text.Caption.OnInk">
+        <item name="android:textColor">@color/paper_on_ink_muted</item>
+    </style>
+
+    <style name="Text.Value">
+        <item name="android:fontFamily">@font/plex_mono_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Text.Readout">
+        <item name="android:fontFamily">@font/plex_mono_semibold</item>
+        <item name="android:textSize">44sp</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+    <style name="Text.Readout.OnInk">
+        <item name="android:textColor">@color/paper_on_ink</item>
+    </style>
+
+    <!-- Category / filter tabs: a rule under the live tab only -->
+    <style name="Text.Tab">
+        <item name="android:fontFamily">@font/plex_mono</item>
+        <item name="android:textSize">10sp</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingTop">11dp</item>
+        <item name="android:paddingBottom">11dp</item>
+        <item name="android:textColor">@color/tab_text</item>
+        <item name="android:background">@drawable/bg_tab</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- ============ Buttons ============ -->
+    <style name="Widget.Instrument.Button" parent="Widget.AppCompat.Button">
+        <item name="android:fontFamily">@font/plex_mono_semibold</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.14</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:paddingLeft">14dp</item>
+        <item name="android:paddingRight">14dp</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:background">@drawable/bg_action_ink</item>
+        <item name="android:textColor">@color/action_ink_text</item>
+    </style>
+    <style name="Widget.Instrument.Button.Primary">
+        <item name="android:background">@drawable/bg_action_primary</item>
+        <item name="android:textColor">@color/action_primary_text</item>
+    </style>
+    <style name="Widget.Instrument.Button.Ghost">
+        <item name="android:background">@drawable/bg_action_ghost</item>
+        <item name="android:textColor">@color/action_ghost_text</item>
+    </style>
+    <style name="Widget.Instrument.Button.Ink">
+        <item name="android:background">@drawable/bg_action_ink</item>
+        <item name="android:textColor">@color/action_ink_text</item>
+    </style>
+
+    <style name="Widget.Instrument.Button.Quiet">
+        <item name="android:background">@drawable/bg_action_quiet</item>
+        <item name="android:textColor">@color/action_primary_text</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">8dp</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <!-- Text field: no box, just a caret on a ruled row -->
+    <style name="Widget.Instrument.Field">
+        <item name="android:background">@null</item>
+        <item name="android:textColor">@color/ink</item>
+        <item name="android:textColorHint">@color/ink_faint</item>
+        <item name="android:fontFamily">@font/plex_mono_medium</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:gravity">end|center_vertical</item>
+        <item name="android:paddingTop">14dp</item>
+        <item name="android:paddingBottom">14dp</item>
+        <item name="android:paddingLeft">8dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_oxide</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+</resources>

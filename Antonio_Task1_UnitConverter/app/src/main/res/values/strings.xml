@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">01 Converter</string>
+
+    <string name="masthead_left">OIBSIP / INSTRUMENT 01</string>
+    <string name="masthead_right">REV 1.0</string>
+    <string name="title">Converter</string>
+    <string name="standfirst">Length, weight, volume, temperature. Twenty-six units in one ruled column, and no rounding tricks you did not ask for.</string>
+
+    <string name="category_length_note">8 units · metric ↔ imperial · base: metre</string>
+    <string name="category_weight_note">7 units · avoirdupois ↔ metric · base: gram</string>
+    <string name="category_volume_note">8 units · SI ↔ US customary · base: litre</string>
+    <string name="category_temp_note">3 scales · absolute zero at −273.15 °C</string>
+
+    <string name="tab_length">Length</string>
+    <string name="tab_weight">Weight</string>
+    <string name="tab_volume">Volume</string>
+    <string name="tab_temp">Temp</string>
+
+    <string name="label_value">01 / Value</string>
+    <string name="label_from">02 / From</string>
+    <string name="label_to">03 / To</string>
+    <string name="hint_value">enter a number</string>
+    <string name="swap">Swap from / to</string>
+
+    <string name="result_label">Converted value</string>
+    <string name="result_placeholder">—</string>
+    <string name="awaiting">Awaiting a value. Type a number, pick two units, then press convert.</string>
+    <string name="convert">Convert</string>
+
+    <string name="colophon">SI BASE UNITS · 1 IN = 2.54 CM EXACT · 1 LB = 453.59237 G · 1 US GAL = 3.785411784 L</string>
+
+    <string name="toast_empty">Enter a value to convert.</string>
+    <string name="toast_nan">That is not a number.</string>
+    <string name="toast_absolute_zero">Below absolute zero. −273.15 °C is the floor.</string>
+    <string name="toast_too_big">Too large to convert reliably. Keep the input under 1 × 10¹⁵.</string>
+    <string name="toast_copied">Result copied to the clipboard.</string>
+</resources>
