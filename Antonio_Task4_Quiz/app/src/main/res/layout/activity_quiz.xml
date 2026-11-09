@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/paper"
+    android:fitsSystemWindows="true"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingTop="14dp"
+        android:paddingRight="@dimen/screen_pad">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/Text.Legend"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/masthead_left" />
+
+            <TextView
+                android:id="@+id/counter"
+                style="@style/Text.Legend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/masthead_right" />
+        </LinearLayout>
+
+        <!-- Progress as a ruled measure, not a pill -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="9dp"
+            android:orientation="horizontal">
+
+            <View
+                android:id="@+id/progressDone"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="0.001"
+                android:background="@color/ink" />
+
+            <View
+                android:id="@+id/progressRest"
+                android:layout_width="0dp"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:background="@color/rule" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/questionText"
+            style="@style/Text.Display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:layout_marginRight="10dp"
+            android:textSize="25sp" />
+
+        <TextView
+            android:id="@+id/hintText"
+            style="@style/Text.Legend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="14dp"
+            android:text="@string/tap_to_answer" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingRight="@dimen/screen_pad">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/ink" />
+
+        <TextView
+            android:id="@+id/option0"
+            style="@style/Text.Option"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rule" />
+
+        <TextView
+            android:id="@+id/option1"
+            style="@style/Text.Option"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rule" />
+
+        <TextView
+            android:id="@+id/option2"
+            style="@style/Text.Option"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rule" />
+
+        <TextView
+            android:id="@+id/option3"
+            style="@style/Text.Option"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/rule" />
+
+        <TextView
+            android:id="@+id/noteText"
+            style="@style/Text.Caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:paddingBottom="8dp"
+            android:visibility="gone" />
+    </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/screen_pad"
+        android:paddingTop="10dp"
+        android:paddingRight="@dimen/screen_pad"
+        android:paddingBottom="14dp">
+
+        <Button
+            android:id="@+id/nextButton"
+            style="@style/Widget.Instrument.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/action_height"
+            android:enabled="false"
+            android:text="@string/next_question" />
+    </LinearLayout>
+</LinearLayout>

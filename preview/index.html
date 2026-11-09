@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gutter &amp; Rule — five Android instruments (OIBSIP)</title>
+<meta name="description" content="Interactive prototype of five Android apps built for the Oasis Infobyte internship: converter, ledger, calculator, quiz, chronograph." />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============ left rail: the studio plate ============ -->
+<aside class="plate">
+  <div class="plate-top">
+    <span class="legend">Gutter &amp; Rule</span>
+    <span class="legend legend--faint">Rev 1.0</span>
+  </div>
+  <hr class="rule rule--ink" />
+  <h1 class="plate-title">Five<br /><em>instruments</em>.</h1>
+  <p class="caption">Five Android apps for the Oasis Infobyte internship, drawn as one set of measuring instruments. Java and XML, no third-party UI kit, no gradients, no cards.</p>
+
+  <ol class="contents">
+    <li><a href="#i1"><span class="legend">01</span> Converter</a></li>
+    <li><a href="#i2"><span class="legend">02</span> Ledger</a></li>
+    <li><a href="#i3"><span class="legend">03</span> Calculator</a></li>
+    <li><a href="#i4"><span class="legend">04</span> Passage</a></li>
+    <li><a href="#i5"><span class="legend">05</span> Chronograph</a></li>
+  </ol>
+
+  <hr class="rule" />
+  <dl class="spec">
+    <div><dt class="legend">Type</dt><dd>Instrument Serif<br />IBM Plex Mono</dd></div>
+    <div><dt class="legend">Accent</dt><dd><span class="swatch"></span> Oxide #C8452B</dd></div>
+    <div><dt class="legend">Build</dt><dd>Android Studio · minSdk 26</dd></div>
+  </dl>
+  <p class="plate-foot legend legend--faint">Prototype in the browser · the shipped UI is Android XML</p>
+</aside>
+
+<!-- ============ the shelf ============ -->
+<main class="shelf">
+
+  <section class="shelf-head">
+    <p class="legend">OIBSIP / Demo sheet</p>
+    <hr class="rule rule--ink" />
+    <div class="shelf-head-row">
+      <h2>Every screen is one instrument column: legend gutter, ruled rows, one readout anchored low. Nothing centred, nothing floating.</h2>
+      <p class="caption">These five panels are live prototypes of the Android screens in <code>Antonio_Task1…5</code>. Type in them, tap them, break them. Each one lists the edge cases it handles underneath.</p>
+    </div>
+  </section>
+
+  <div class="grid" data-shelf></div>
+
+  <footer class="colophon">
+    <hr class="rule rule--ink" />
+    <p class="legend">Gutter &amp; Rule · OIBSIP 2026 · Java + XML · 0 dp corner radius · 0 dp elevation</p>
+  </footer>
+</main>
+
+<script src="apps.js"></script>
+</body>
+</html>
