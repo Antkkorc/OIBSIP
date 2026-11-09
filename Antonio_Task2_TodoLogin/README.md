@@ -1,167 +1,131 @@
-# 02 · Ledger — to-do list with login
+# 02 Task list with login
 
-**OIBSIP · Android App Development · 2026**
-Part of the [five-instrument set](../README.md). Design language: [Gutter & Rule](../docs/STUDIO.md).
-Build instructions: [BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
+A task list where every task belongs to an account. Register, sign in, add tasks, tick
+them off, delete them, log out. Data lives in SQLite on the phone and passwords are
+stored as PBKDF2 hashes.
 
-A task manager where the tasks belong to an account. Register, sign in, keep a list, strike entries
-through, delete them for good, log out. Everything lives in a local **SQLite** database; passwords
-are stored as **PBKDF2-HMAC-SHA256** hashes, never as text.
+Part of the [OIBSIP set](../README.md). Design: [docs/DESIGN.md](../docs/DESIGN.md).
+Build: [docs/BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
 
 | | |
-|---|---|
-| Launcher label | `02 Ledger` |
-| Package | `bw.oibsip.ledger` |
-| Screens | `LoginActivity` · `RegisterActivity` · `TasksActivity` |
-| Testable core | `PasswordHasher` (no Android imports) |
-| Tests | 6 (`PasswordHasherTest`) |
+| --- | --- |
+| Launcher label | Tasks |
+| Package | `bw.oibsip.tasks` |
+| Screens | `LoginActivity`, `RegisterActivity`, `TasksActivity` |
+| Logic | `PasswordHasher`, no Android imports |
+| Tests | 6 in `PasswordHasherTest` |
 
-## Screens
+## What it does
 
-```
-SIGN IN                                OPEN ACCOUNT                 LEDGER
-The Ledger                             Open an account              The Ledger        Log out
-…                                      …                            ─────────────────────────
-01 / Email    [ you@example.com ]      01 / Name     [ … ]           04 ··· OPEN        Antonio
-02 / Password [ •••••••••••••• ]       02 / Email    [ … ]              02 done
-error line (oxide, only when needed)   03 / Password [ … ]           ALL   OPEN   DONE
-[            SIGN IN            ]      [        CREATE ACCOUNT   ]   ─────────────────────────
-No account? Register                   Already registered? Sign in  [ ] Task title          DEL
-Use the demo account                                                 [x] Struck-through task
-PBKDF2-SHA256 · 120,000 iterations                                   [        ADD ENTRY       ]
-```
+The first screen is sign in. A saved session skips it and goes straight to the list.
+New users create an account with a name, an email and a password of at least eight
+characters, then land on the task list already signed in.
+
+The list has a count line, three filters and one floating button. Adding a task opens a
+bottom sheet with a title and an optional note. Tapping a row marks it done, which
+strikes the title through and fills the check tile with the gradient. The delete button
+asks once before removing anything.
+
+Log out clears the session and returns to sign in. The next account sees only its own
+tasks.
+
+## Requirements
+
+| Brief line | Where |
+| --- | --- |
+| Register and login screens | `activity_register.xml`, `activity_login.xml` |
+| Passwords hashed, not plain text | `PasswordHasher.hash()`, PBKDF2-HMAC-SHA256, 120,000 rounds, salt per account |
+| Storage in SQLite | `TaskDb` with a `users` table and a `tasks` table |
+| Logout clears the session | `SessionStore.signOut()`, then back to login with `CLEAR_TASK` |
+| Tasks per user | every query in `TaskStore` and `UserStore` filters on the owner |
+| Add task with an optional note | `dialog_add_task.xml` and `TasksActivity.showAddDialog()` |
+| Complete with strikethrough | `TaskAdapter.bind()` sets `STRIKE_THRU_TEXT_FLAG` |
+| Delete | `dialog_confirm.xml`, then `TaskStore.delete()` |
+| Empty state | centred card with an icon and one line per filter |
 
 ## Database
 
-```sql
-CREATE TABLE users (
-  _id           INTEGER PRIMARY KEY AUTOINCREMENT,
-  name          TEXT NOT NULL,
-  email         TEXT NOT NULL COLLATE NOCASE UNIQUE,
-  password_hash TEXT NOT NULL,          -- Base64 PBKDF2 output
-  salt          TEXT NOT NULL,          -- Base64, unique per account
-  created_at    INTEGER NOT NULL DEFAULT 0
-);
+```
+users
+  _id            integer primary key
+  name           text
+  email          text, unique, case insensitive
+  password_hash  text, Base64 of the PBKDF2 output
+  salt           text, Base64, sixteen bytes, one per account
+  created_at     integer
 
-CREATE TABLE tasks (
-  _id          INTEGER PRIMARY KEY AUTOINCREMENT,
-  user_id      INTEGER NOT NULL REFERENCES users(_id) ON DELETE CASCADE,
-  title        TEXT NOT NULL,
-  notes        TEXT NOT NULL DEFAULT '',
-  done         INTEGER NOT NULL DEFAULT 0,
-  created_at   INTEGER NOT NULL DEFAULT 0,
-  completed_at INTEGER
-);
-CREATE INDEX idx_tasks_owner ON tasks(user_id, done);
+tasks
+  _id           integer primary key
+  user_id       integer, foreign key to users
+  title         text
+  notes         text, may be empty
+  done          integer, 0 or 1
+  created_at    integer
+  completed_at  integer, null while open
+
+index idx_tasks_owner on tasks(user_id, done)
 ```
 
-Foreign keys are enabled explicitly in `onConfigure()` — SQLite ignores them by default, which is
-how orphaned rows quietly pile up in student projects.
-
-## Requirements → implementation
-
-| Brief line | Implementation |
-|---|---|
-| Login screen with email + password | `activity_login.xml` → `LoginActivity.submit()` |
-| Sign-up with name, email, password | `activity_register.xml` → `RegisterActivity.submit()` |
-| Passwords hashed, not plaintext | `PasswordHasher.hash()`: PBKDF2-HMAC-SHA256, 120,000 iterations, 256-bit key, 16-byte salt per account, `MessageDigest.isEqual` for comparison |
-| Logout clears the session | `SessionStore.signOut()` then `TasksActivity.goToLogin()` with `CLEAR_TASK` |
-| Task list for the logged-in user | `TaskStore.list(userId, filter)` — the `user_id = ?` predicate is in every query |
-| Add task dialog with notes | `dialog_task.xml` + `showAddDialog()` |
-| Mark complete (strikethrough) | `TaskAdapter.bind()` sets `Paint.STRIKE_THRU_TEXT_FLAG`; the 3 dp open marker disappears |
-| Delete permanently | `dialog_confirm.xml` → `TaskStore.delete(taskId, userId)` |
-| Tasks linked per account | FK `tasks.user_id → users._id` with `ON DELETE CASCADE` |
-| Empty state | `emptyState` block, copy changes per filter |
-
-## Details worth defending
-
-- **Why PBKDF2 and not MD5/SHA?** The brief says “basic hashing”; a bare digest is a checksum. 120k
-  PBKDF2 iterations cost roughly 100–250 ms per attempt on a mid-range phone — invisible to a user
-  signing in once, expensive to anyone trying a wordlist. The salt makes precomputed tables useless
-  and stops two users with the same password from sharing a hash.
-- **Same error for unknown email and wrong password.** The message never confirms which half was
-  wrong, and `UserStore.burnSameTime()` performs a dummy PBKDF2 derivation when no account exists, so
-  the response time does not leak account existence either.
-- **Hashing never blocks the UI.** Login and registration run on a single-thread `ExecutorService`
-  with the button disabled; results come back through `runOnUiThread`.
-- **No plaintext anywhere.** `SessionStore` keeps only a user id in `SharedPreferences` — no email,
-  no password, no token.
-- **`ListAdapter` + `DiffUtil`** so toggling one row animates that row, not the whole list; add and
-  remove are instant by policy (no entrance animations), only changes fade.
-
-## Edge cases handled
-
-| Case | Behaviour |
-|---|---|
-| Empty ledger | “The ledger is clean. Add the first entry. It stays on this phone.” |
-| Empty filter | Different copy for Open and Done — never a blank panel |
-| 120-character title | `maxLength=120`, two lines with ellipsis, row height stays stable |
-| Long notes | Two lines, ellipsis; hidden entirely when a task has no notes |
-| Pasted whitespace | Collapsed with `replaceAll("\\s+", " ")` before insert |
-| Duplicate email | `UNIQUE` + `CONFLICT_IGNORE` → “An account already exists for that email.” |
-| Short password | “Use at least 8 characters. Longer is better than clever.” |
-| Expired session | A stored id whose account no longer exists signs out with a message |
-| 100+ tasks | RecyclerView; the open count grows to three digits without breaking the serif block |
-| Rotation / process death | Data is in SQLite; the session is in SharedPreferences; nothing is held in memory |
+Foreign keys are switched on in `onConfigure()`. SQLite ignores them by default, and
+that default is how orphaned rows end up in a database.
 
 ## Files
 
 ```
-app/src/main/java/bw/oibsip/ledger/
-├── LedgerDb.java          SQLiteOpenHelper, schema, foreign keys
-├── UserStore.java         register / login / byId, email normalisation, timing equalisation
-├── PasswordHasher.java    PBKDF2-HMAC-SHA256, salt, constant-time verify
-├── TaskStore.java         user-scoped queries, add, toggle, delete, counts
-├── SessionStore.java      SharedPreferences session
-├── Task.java              immutable row model
-├── TaskAdapter.java       ListAdapter + DiffUtil + strikethrough
-├── LoginActivity.java
-├── RegisterActivity.java
-└── TasksActivity.java
-app/src/test/java/bw/oibsip/ledger/PasswordHasherTest.java
+app/src/main/java/bw/oibsip/tasks/
+  TaskDb.java            schema, versioning, foreign keys
+  UserStore.java         register, login, lookup by id
+  SessionStore.java      which account is signed in
+  PasswordHasher.java    PBKDF2, salt generation, constant time compare
+  TaskStore.java         list, add, toggle, delete, counts
+  Task.java              one row, immutable
+  TaskAdapter.java       RecyclerView adapter with the glass row
+  LoginActivity.java
+  RegisterActivity.java
+  TasksActivity.java
+  GlassUi.java
+  GlassApp.java
+app/src/main/res/layout/
+  activity_login.xml  activity_register.xml  activity_tasks.xml
+  item_task.xml  dialog_add_task.xml  dialog_confirm.xml
+app/src/test/java/.../PasswordHasherTest.java
 ```
 
-## Run and test
+## Details worth knowing
 
-```bash
-cd Antonio_Task2_TodoLogin
-./gradlew testDebugUnitTest      # 6 hashing tests
-./gradlew installDebug
-```
+**Hashing.** The brief asks for basic hashing. A single SHA-256 digest would satisfy that
+sentence and fail the point of it, because a leaked table can be reversed with a
+dictionary in minutes. This uses PBKDF2-HMAC-SHA256 with a per account salt and 120,000
+iterations, and compares with `MessageDigest.isEqual` so the comparison does not leak
+timing.
 
-To inspect the database in a debug build: **View → Tool Windows → App Inspection → Database
-Inspector** while the app is running. You should see `password_hash` and `salt` columns full of
-Base64, and no password anywhere.
+**Login timing.** A wrong email returns immediately if the code only checks the password
+hash for accounts that exist. That tells an attacker which emails are registered. The
+login path runs the same PBKDF2 work against a dummy hash when the account is missing,
+so both answers take the same time.
 
-## Demo in 60 seconds
+**Session.** Only the user id is written to `SharedPreferences`. No email, no password,
+no token. Signing out clears the file.
 
-1. **Register** with any name, an email and 8+ characters → you land in an empty ledger.
-2. **Add entry** → title + notes → it appears with an ink marker and `01` open.
-3. Tap the row → strikethrough, marker gone, count `00`, entry moves under the finished section.
-4. **Del** on a row → confirmation → gone permanently.
-5. **Log out** → sign-in screen. Sign in again → the entries are still there.
-6. Register a **second** account → its ledger is empty. That is the `user_id` scope working.
-
-## Viva
-
-**What happens if two people use the same phone?**
-Two rows in `users`, and every task row carries a `user_id`. `TaskStore` always filters by the
-signed-in id, and `delete`/`setDone` include `AND user_id = ?` so a task cannot be edited by
-guessing an id.
-
-**Why not store the salt secretly?**
-A salt is not a secret, it is uniqueness. It stops precomputation and identical hashes. The secret
-is the password; the iteration count buys the time.
-
-**How would you rate-limit login attempts?**
-Not implemented. Next step: a failed-attempt counter in `SharedPreferences` with a backoff, or
-Android's `BiometricPrompt` for device-bound unlock.
-
-**Why hand-rolled dialogs instead of `AlertDialog`?**
-`AlertDialog` brings Material typography, rounded white sheets and coloured buttons — three things
-this design language bans. A plain `Dialog` with a custom view keeps the paper surface and the ruled
+**Ownership.** `TaskStore` never takes a task id alone. Every call takes the user id too
+and puts it in the `where` clause, so a stale adapter cannot touch another account's
 rows.
 
-**What is the biggest weakness?**
-The database file is not encrypted. Anyone with a rooted device or a backup can read the task text
-(not the passwords). SQLCipher or `EncryptedFile` is the honest next step.
+**Rotation.** The current filter and the list survive rotation. The add sheet closes,
+which is the normal behaviour for a dialog and avoids a half typed task appearing twice.
+
+## Run it
+
+```
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+Tests:
+
+```
+./gradlew test
+```
+
+To see it with data, register one account and add two tasks, then log out and register a
+second account. Neither list should show the other account's rows.

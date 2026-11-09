@@ -1,168 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/paper"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:background="@drawable/bg_backdrop">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="@dimen/screen_pad"
-        android:paddingTop="14dp"
-        android:paddingRight="@dimen/screen_pad">
+        android:paddingTop="16dp"
+        android:paddingRight="@dimen/screen_pad"
+        android:paddingBottom="18dp">
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
-                style="@style/Text.Legend"
+                android:id="@+id/counter"
+                style="@style/Text.Label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/masthead_left" />
+                android:textColor="@color/accent_start"
+                android:textSize="12sp" />
 
-            <TextView
-                android:id="@+id/counter"
-                style="@style/Text.Legend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/masthead_right" />
+            <ImageButton
+                android:id="@+id/quitButton"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@drawable/bg_pill_ghost"
+                android:contentDescription="@string/quit"
+                android:padding="11dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_close" />
         </LinearLayout>
 
-        <!-- Progress as a ruled measure, not a pill -->
         <LinearLayout
+            android:id="@+id/progressRow"
             android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="9dp"
+            android:layout_height="6dp"
+            android:layout_marginTop="14dp"
             android:orientation="horizontal">
 
             <View
                 android:id="@+id/progressDone"
                 android:layout_width="0dp"
-                android:layout_height="2dp"
-                android:layout_weight="0.001"
-                android:background="@color/ink" />
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/bg_track_fill" />
 
             <View
                 android:id="@+id/progressRest"
                 android:layout_width="0dp"
-                android:layout_height="2dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="4dp"
                 android:layout_weight="1"
-                android:background="@color/rule" />
+                android:background="@drawable/bg_track" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/questionText"
-            style="@style/Text.Display"
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
-            android:layout_marginRight="10dp"
-            android:textSize="25sp" />
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp"
+                android:paddingBottom="12dp">
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/questionCard"
+                    style="@style/Widget.GlassCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/questionText"
+                        style="@style/Text.Title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.2"
+                        android:padding="20dp"
+                        android:textSize="20sp" />
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:id="@+id/option0"
+                    style="@style/Widget.Option"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp" />
+
+                <TextView
+                    android:id="@+id/option1"
+                    style="@style/Widget.Option"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:id="@+id/option2"
+                    style="@style/Widget.Option"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+
+                <TextView
+                    android:id="@+id/option3"
+                    style="@style/Widget.Option"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
+        </ScrollView>
 
         <TextView
             android:id="@+id/hintText"
-            style="@style/Text.Legend"
+            style="@style/Text.Label"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:layout_marginBottom="14dp"
-            android:text="@string/tap_to_answer" />
-    </LinearLayout>
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:scrollbars="none">
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/screen_pad"
-        android:paddingRight="@dimen/screen_pad">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/ink" />
-
-        <TextView
-            android:id="@+id/option0"
-            style="@style/Text.Option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
-
-        <TextView
-            android:id="@+id/option1"
-            style="@style/Text.Option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
-
-        <TextView
-            android:id="@+id/option2"
-            style="@style/Text.Option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
-
-        <TextView
-            android:id="@+id/option3"
-            style="@style/Text.Option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="@string/hint_choose" />
 
         <TextView
             android:id="@+id/noteText"
-            style="@style/Text.Caption"
+            style="@style/Text.Body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:paddingBottom="8dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="12.5sp"
             android:visibility="gone" />
-    </LinearLayout>
-    </ScrollView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/screen_pad"
-        android:paddingTop="10dp"
-        android:paddingRight="@dimen/screen_pad"
-        android:paddingBottom="14dp">
 
         <Button
             android:id="@+id/nextButton"
-            style="@style/Widget.Instrument.Button.Primary"
+            style="@style/Widget.Pill.Primary"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/action_height"
-            android:enabled="false"
+            android:layout_height="54dp"
             android:text="@string/next_question" />
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

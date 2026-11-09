@@ -1,35 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">05 Chronograph</string>
+    <string name="app_name">Stopwatch</string>
+    <string name="title">Stopwatch</string>
+    <string name="subtitle">Hundredths, kept across app switches</string>
 
-    <string name="masthead_left">OIBSIP / INSTRUMENT 05</string>
-    <string name="masthead_right">REV 1.0</string>
-    <string name="title">Chronograph</string>
-    <string name="standfirst">Forty-millisecond resolution, measured from the boot clock rather than the wall clock, so putting the phone down does not lose time.</string>
-
-    <string name="elapsed_legend">Elapsed</string>
-    <string name="state_idle">Idle</string>
+    <string name="state_idle">Ready</string>
     <string name="state_running">Running</string>
     <string name="state_paused">Paused</string>
 
     <string name="start">Start</string>
     <string name="resume">Resume</string>
-    <string name="stop">Stop</string>
+    <string name="pause">Pause</string>
     <string name="lap">Lap</string>
     <string name="reset">Reset</string>
 
-    <string name="laps_label">Laps</string>
-    <string name="laps_count">%1$d recorded</string>
-    <string name="column_index">#</string>
-    <string name="column_split">Split</string>
-    <string name="column_total">Total</string>
+    <string name="laps_title">Laps</string>
+    <string name="last_lap_none">No laps yet</string>
+    <string name="last_lap">Last lap %1$s, total %2$s</string>
     <string name="best">Best</string>
-    <string name="worst">Worst</string>
+    <string name="worst">Slowest</string>
+    <string name="empty_laps">Laps you record will line up here.</string>
 
-    <string name="empty_laps_title">No laps yet.</string>
-    <string name="empty_laps_hint">Lap records a split without stopping the clock. Stop freezes the total.</string>
-
-    <string name="last_lap_none">No lap recorded</string>
-    <string name="last_lap">Last lap %1$s · total %2$s</string>
-    <string name="persist_note">Saved across screen lock · resumes from the boot clock</string>
+    <plurals name="laps_count">
+        <item quantity="one">%1$d lap</item>
+        <item quantity="other">%1$d laps</item>
+    </plurals>
 </resources>

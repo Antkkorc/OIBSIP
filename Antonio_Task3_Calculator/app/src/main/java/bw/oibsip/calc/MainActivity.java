@@ -9,14 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
- * Instrument 03 — Calculator.
- *
- * The tape is a token list, never a raw string, so rapid or repeated taps can only ever
- * produce a valid chain: numbers and operators alternate, and a second consecutive
- * operator replaces the first instead of corrupting the expression.
+ * Calculator screen. The tape is a token list rather than a raw string, so fast or
+ * repeated taps can only build a valid chain: numbers and operators alternate, and a
+ * second operator in a row replaces the first instead of breaking the expression.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -46,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        GlassUi.install(this, R.layout.activity_main);
 
         tapeView = findViewById(R.id.tape);
         resultView = findViewById(R.id.result);
@@ -54,6 +51,10 @@ public class MainActivity extends AppCompatActivity {
         bindKeys();
         restore(savedInstanceState);
         render();
+
+        GlassUi.enter(findViewById(R.id.header), 0L);
+        GlassUi.enter(findViewById(R.id.cardReadout), 70L);
+        GlassUi.enter(findViewById(R.id.keypad), 140L);
     }
 
     private void bindKeys() {
@@ -108,6 +109,17 @@ public class MainActivity extends AppCompatActivity {
                 pressPercent();
             }
         });
+
+        // Same spring press on every key, including the two image buttons.
+        GlassUi.pressAll(
+                findViewById(R.id.key0), findViewById(R.id.key1), findViewById(R.id.key2),
+                findViewById(R.id.key3), findViewById(R.id.key4), findViewById(R.id.key5),
+                findViewById(R.id.key6), findViewById(R.id.key7), findViewById(R.id.key8),
+                findViewById(R.id.key9), findViewById(R.id.keyDot), findViewById(R.id.keyAdd),
+                findViewById(R.id.keySubtract), findViewById(R.id.keyMultiply),
+                findViewById(R.id.keyDivide), findViewById(R.id.keyEquals),
+                findViewById(R.id.keyClear), findViewById(R.id.keyDelete),
+                findViewById(R.id.keySign), findViewById(R.id.keyPercent));
     }
 
     private void bindDigit(int id, final String digit) {
@@ -317,7 +329,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void enterError(String reason) {
         error = true;
-        errorReason = reason.toUpperCase(Locale.US);
+        errorReason = reason;
         tokens.clear();
         operand = "";
         resultRaw = null;
@@ -330,7 +342,7 @@ public class MainActivity extends AppCompatActivity {
     private void render() {
         String big;
         if (error) {
-            big = getString(R.string.error_text).toUpperCase(Locale.US);
+            big = getString(R.string.error_text);
         } else if (!operand.isEmpty()) {
             big = Evaluator.group(operand);
         } else if (evaluated && resultRaw != null) {
@@ -353,14 +365,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         resultView.setText(big);
-        tapeView.setText(tape.toUpperCase(Locale.US));
+        tapeView.setText(tape);
     }
 
-    /** 120ms alpha settle, only when a value is final. */
+    /** Alpha settle when a value is final, so numbers never snap in. */
     private void fadeReadout() {
-        resultView.animate().cancel();
-        resultView.setAlpha(0.3f);
-        resultView.animate().alpha(1f).setDuration(120).start();
+        GlassUi.refresh(resultView);
     }
 
     private void restore(Bundle state) {

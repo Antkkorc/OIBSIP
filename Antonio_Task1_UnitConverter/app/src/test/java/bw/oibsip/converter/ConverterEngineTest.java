@@ -122,7 +122,7 @@ public class ConverterEngineTest {
         assertEquals("0", ConverterEngine.format(0d));
         assertEquals("0", ConverterEngine.format(-0.00000001d));
         assertEquals("1.000000E+13", ConverterEngine.format(1e13d));
-        assertEquals("—", ConverterEngine.format(Double.NaN));
+        assertEquals("Out of range", ConverterEngine.format(Double.NaN));
     }
 
     @Test
@@ -138,10 +138,10 @@ public class ConverterEngineTest {
     }
 
     @Test
-    public void sentenceReadsLikeAStamp() {
+    public void sentenceReadsLikeAPlainLine() {
         ConverterEngine.Unit from = unit(ConverterEngine.Category.LENGTH, "cm");
         ConverterEngine.Unit to = unit(ConverterEngine.Category.LENGTH, "in");
         String sentence = ConverterEngine.sentence(250, from, to, "98.425197");
-        assertEquals("250 CM  =  98.425197 IN", sentence);
+        assertEquals("250 cm = 98.425197 in", sentence);
     }
 }

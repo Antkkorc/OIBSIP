@@ -1,207 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/paper"
-    android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:background="@drawable/bg_backdrop">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/screen_pad"
-        android:paddingTop="14dp"
-        android:paddingRight="@dimen/screen_pad">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/masthead_left" />
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/masthead_right" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="9dp"
-            android:background="@color/ink" />
-
-        <TextView
-            style="@style/Text.Display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/title"
-            android:textSize="26sp" />
-
-        <TextView
-            style="@style/Text.Caption"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:layout_marginRight="20dp"
-            android:text="@string/standfirst"
-            android:textSize="10sp" />
-    </LinearLayout>
-
-    <!-- Readout: the dominant object in the app -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/screen_pad"
-        android:layout_marginTop="12dp"
-        android:layout_marginRight="@dimen/screen_pad"
-        android:background="@drawable/bg_readout"
-        android:orientation="vertical"
-        android:paddingLeft="18dp"
-        android:paddingTop="14dp"
-        android:paddingRight="18dp"
-        android:paddingBottom="14dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                style="@style/Text.Legend.OnInk"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/elapsed_legend" />
-
-            <View
-                android:id="@+id/runDot"
-                android:layout_width="7dp"
-                android:layout_height="7dp"
-                android:layout_gravity="center_vertical"
-                android:background="@color/oxide"
-                android:visibility="invisible" />
-
-            <TextView
-                android:id="@+id/stateLabel"
-                style="@style/Text.Legend.OnInk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="6dp"
-                android:text="@string/state_idle" />
-        </LinearLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/timeDisplay"
-            style="@style/Text.Readout.OnInk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:maxLines="1"
-            android:text="00:00.00"
-            app:autoSizeMaxTextSize="66sp"
-            app:autoSizeMinTextSize="26sp"
-            app:autoSizeStepGranularity="2sp"
-            app:autoSizeTextType="uniform" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="10dp"
-            android:background="@color/rule_dark" />
-
-        <TextView
-            android:id="@+id/lastLap"
-            style="@style/Text.Caption.OnInk"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/last_lap_none" />
-    </LinearLayout>
-
-    <!-- Lap ledger -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:paddingLeft="@dimen/screen_pad"
         android:paddingTop="16dp"
-        android:paddingRight="@dimen/screen_pad">
+        android:paddingRight="@dimen/screen_pad"
+        android:paddingBottom="18dp">
 
+        <!-- header -->
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                style="@style/Widget.IconTile"
+                android:layout_width="44dp"
+                android:layout_height="44dp">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_chrono" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/Text.Display"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/title" />
+
+                <TextView
+                    style="@style/Text.Subtitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/subtitle" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- readout -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardReadout"
+            style="@style/Widget.GlassCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <View
+                    android:layout_width="260dp"
+                    android:layout_height="260dp"
+                    android:layout_gravity="center"
+                    android:background="@drawable/bg_glow" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingLeft="18dp"
+                    android:paddingTop="24dp"
+                    android:paddingRight="18dp"
+                    android:paddingBottom="20dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/runDot"
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:layout_marginEnd="7dp"
+                            android:background="@drawable/bg_check_on"
+                            android:visibility="invisible" />
+
+                        <TextView
+                            android:id="@+id/stateLabel"
+                            style="@style/Text.Label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/state_idle"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.AppCompatTextView
+                        android:id="@+id/timeDisplay"
+                        style="@style/Text.Readout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:text="00:00.00"
+                        android:textSize="46sp"
+                        app:autoSizeMaxTextSize="52sp"
+                        app:autoSizeMinTextSize="30sp"
+                        app:autoSizeStepGranularity="2sp"
+                        app:autoSizeTextType="uniform" />
+
+                    <TextView
+                        android:id="@+id/lastLap"
+                        style="@style/Text.Body"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:gravity="center"
+                        android:text="@string/last_lap_none"
+                        android:textSize="12.5sp" />
+                </LinearLayout>
+            </FrameLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- laps -->
+        <LinearLayout
+            android:id="@+id/lapHeader"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
             android:orientation="horizontal">
 
             <TextView
-                style="@style/Text.Legend"
+                style="@style/Text.Label"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/laps_label" />
+                android:text="@string/laps_title" />
 
             <TextView
                 android:id="@+id/lapCount"
-                style="@style/Text.Legend"
+                style="@style/Text.Label"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0 recorded" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="7dp"
-            android:background="@color/ink" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingTop="7dp"
-            android:paddingBottom="7dp">
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="52dp"
-                android:layout_height="wrap_content"
-                android:text="@string/column_index" />
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:text="@string/column_split" />
-
-            <TextView
-                style="@style/Text.Legend"
-                android:layout_width="96dp"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:text="@string/column_total" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/rule" />
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -212,87 +174,71 @@
                 android:paddingBottom="6dp"
                 android:scrollbars="none" />
 
-            <LinearLayout
+            <TextView
                 android:id="@+id/emptyLaps"
+                style="@style/Text.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="20dp"
-                android:paddingRight="30dp">
-
-                <TextView
-                    style="@style/Text.Display.Italic"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/empty_laps_title"
-                    android:textSize="22sp" />
-
-                <TextView
-                    style="@style/Text.Caption"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="@string/empty_laps_hint" />
-            </LinearLayout>
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/empty_laps"
+                android:textSize="12.5sp" />
         </FrameLayout>
-    </LinearLayout>
 
-    <!-- Controls: 2x2, every key 54dp so a thumb finds it without looking -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="@dimen/screen_pad"
-        android:paddingTop="8dp"
-        android:paddingRight="@dimen/screen_pad"
-        android:paddingBottom="14dp">
-
+        <!-- controls -->
         <LinearLayout
+            android:id="@+id/dock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginTop="12dp"
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/startButton"
-                style="@style/Widget.Instrument.Button.Primary"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/action_height"
-                android:layout_weight="1"
-                android:text="@string/start" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/stopButton"
-                style="@style/Widget.Instrument.Button.Ink"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/action_height"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:text="@string/stop" />
-        </LinearLayout>
+                <Button
+                    android:id="@+id/startButton"
+                    style="@style/Widget.Pill.Primary"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_weight="1"
+                    android:text="@string/start" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal">
+                <Button
+                    android:id="@+id/stopButton"
+                    style="@style/Widget.Pill.Glass"
+                    android:layout_width="0dp"
+                    android:layout_height="54dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/pause" />
+            </LinearLayout>
 
-            <Button
-                android:id="@+id/lapButton"
-                style="@style/Widget.Instrument.Button.Ghost"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/action_height"
-                android:layout_weight="1"
-                android:text="@string/lap" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/resetButton"
-                style="@style/Widget.Instrument.Button.Ghost"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/action_height"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:text="@string/reset" />
+                <Button
+                    android:id="@+id/lapButton"
+                    style="@style/Widget.Pill.Glass"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="@string/lap" />
+
+                <Button
+                    android:id="@+id/resetButton"
+                    style="@style/Widget.Pill.Ghost"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_weight="1"
+                    android:text="@string/reset" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

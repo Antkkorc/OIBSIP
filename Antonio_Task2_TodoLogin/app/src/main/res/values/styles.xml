@@ -1,140 +1,228 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.Instrument" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:windowBackground">@color/paper</item>
-        <item name="android:statusBarColor">@color/paper</item>
-        <item name="android:navigationBarColor">@color/paper</item>
-        <item name="android:windowLightStatusBar">true</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
-        <item name="android:textColorPrimary">@color/ink</item>
-        <item name="android:textColorSecondary">@color/ink_muted</item>
-        <item name="android:colorAccent">@color/oxide</item>
-        <item name="colorAccent">@color/oxide</item>
-        <item name="android:fontFamily">@font/plex_mono</item>
-        <item name="android:windowAnimationStyle">@null</item>
+    <style name="Theme.Glass" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:windowBackground">@drawable/bg_backdrop</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="29">false</item>
+        <item name="android:windowAnimationStyle">@style/Animation.Glass</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+        <item name="android:colorAccent">@color/accent_start</item>
+        <item name="colorAccent">@color/accent_start</item>
+        <item name="colorControlHighlight">@color/accent_soft</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
-    <!-- ============ Signature 1: engraved legend ============ -->
-    <style name="Text.Legend">
-        <item name="android:fontFamily">@font/plex_mono</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0.16</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:textColor">@color/ink_muted</item>
+    <style name="Animation.Glass" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/glass_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/glass_hold</item>
+        <item name="android:activityCloseEnterAnimation">@anim/glass_hold</item>
+        <item name="android:activityCloseExitAnimation">@anim/glass_out</item>
+    </style>
+
+    <!-- ============ type ============ -->
+    <style name="Text.Display">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">26sp</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:includeFontPadding">false</item>
+        <item name="android:lineSpacingMultiplier">1.08</item>
+        <item name="android:letterSpacing">0</item>
+    </style>
+
+    <style name="Text.Title">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Text.Subtitle">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
         <item name="android:lineSpacingMultiplier">1.35</item>
     </style>
-    <style name="Text.Legend.OnInk">
-        <item name="android:textColor">@color/paper_on_ink_muted</item>
-    </style>
-    <style name="Text.Legend.Oxide">
-        <item name="android:textColor">@color/oxide</item>
-    </style>
-    <style name="Text.Legend.Moss">
-        <item name="android:textColor">@color/moss</item>
+
+    <style name="Text.Body">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:lineSpacingMultiplier">1.4</item>
     </style>
 
-    <style name="Text.Display">
-        <item name="android:fontFamily">@font/instrument_serif</item>
-        <item name="android:textSize">34sp</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:includeFontPadding">false</item>
-        <item name="android:lineSpacingMultiplier">0.95</item>
-    </style>
-    <style name="Text.Display.Italic">
-        <item name="android:fontFamily">@font/instrument_serif_italic</item>
-    </style>
-
-    <style name="Text.Caption">
-        <item name="android:fontFamily">@font/plex_mono</item>
+    <style name="Text.Label">
+        <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textSize">11sp</item>
-        <item name="android:textColor">@color/ink_muted</item>
-        <item name="android:lineSpacingMultiplier">1.45</item>
-    </style>
-    <style name="Text.Caption.OnInk">
-        <item name="android:textColor">@color/paper_on_ink_muted</item>
+        <item name="android:textColor">@color/text_tertiary</item>
+        <item name="android:letterSpacing">0.04</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="Text.Value">
-        <item name="android:fontFamily">@font/plex_mono_medium</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
         <item name="android:textSize">15sp</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="Text.Readout">
-        <item name="android:fontFamily">@font/plex_mono_semibold</item>
-        <item name="android:textSize">44sp</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:letterSpacing">-0.02</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">42sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFeatureSettings">tnum</item>
         <item name="android:includeFontPadding">false</item>
-    </style>
-    <style name="Text.Readout.OnInk">
-        <item name="android:textColor">@color/paper_on_ink</item>
+        <item name="android:letterSpacing">-0.01</item>
     </style>
 
-    <!-- Category / filter tabs: a rule under the live tab only -->
-    <style name="Text.Tab">
-        <item name="android:fontFamily">@font/plex_mono</item>
-        <item name="android:textSize">10sp</item>
-        <item name="android:letterSpacing">0.14</item>
-        <item name="android:textAllCaps">true</item>
+    <style name="Text.Key">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">19sp</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:gravity">center</item>
-        <item name="android:paddingTop">11dp</item>
-        <item name="android:paddingBottom">11dp</item>
-        <item name="android:textColor">@color/tab_text</item>
-        <item name="android:background">@drawable/bg_tab</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
-    <!-- ============ Buttons ============ -->
-    <style name="Widget.Instrument.Button" parent="Widget.AppCompat.Button">
-        <item name="android:fontFamily">@font/plex_mono_semibold</item>
-        <item name="android:textSize">11sp</item>
-        <item name="android:letterSpacing">0.14</item>
-        <item name="android:textAllCaps">true</item>
-        <item name="android:minHeight">52dp</item>
-        <item name="android:paddingLeft">14dp</item>
-        <item name="android:paddingRight">14dp</item>
-        <item name="android:stateListAnimator">@null</item>
-        <item name="android:background">@drawable/bg_action_ink</item>
-        <item name="android:textColor">@color/action_ink_text</item>
-    </style>
-    <style name="Widget.Instrument.Button.Primary">
-        <item name="android:background">@drawable/bg_action_primary</item>
-        <item name="android:textColor">@color/action_primary_text</item>
-    </style>
-    <style name="Widget.Instrument.Button.Ghost">
-        <item name="android:background">@drawable/bg_action_ghost</item>
-        <item name="android:textColor">@color/action_ghost_text</item>
-    </style>
-    <style name="Widget.Instrument.Button.Quiet">
-        <item name="android:background">@drawable/bg_action_quiet</item>
-        <item name="android:textColor">@color/action_primary_text</item>
-        <item name="android:minHeight">0dp</item>
-        <item name="android:minWidth">0dp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">8dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:paddingBottom">10dp</item>
+    <style name="Text.KeySmall">
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
     </style>
 
-    <!-- Text field: no box, just a caret on a ruled row -->
-    <style name="Widget.Instrument.Field">
-        <item name="android:background">@null</item>
-        <item name="android:textColor">@color/ink</item>
-        <item name="android:textColorHint">@color/ink_faint</item>
-        <item name="android:fontFamily">@font/plex_mono_medium</item>
-        <item name="android:textSize">17sp</item>
-        <item name="android:gravity">end|center_vertical</item>
+    <style name="Text.Option">
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">13.5sp</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:lineSpacingMultiplier">1.35</item>
+    </style>
+
+    <!-- ============ surfaces ============ -->
+    <style name="Widget.GlassCard" parent="androidx.cardview.widget.CardView">
+        <item name="cardCornerRadius">24dp</item>
+        <item name="cardElevation">12dp</item>
+        <item name="cardMaxElevation">18dp</item>
+        <item name="cardBackgroundColor">@color/glass_fill</item>
+        <item name="cardPreventCornerOverlap">false</item>
+        <item name="cardUseCompatPadding">false</item>
+        <item name="android:foreground">@drawable/fg_glass_border</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:outlineAmbientShadowColor" tools:targetApi="28">@color/shadow_glow</item>
+        <item name="android:outlineSpotShadowColor" tools:targetApi="28">#99000000</item>
+    </style>
+
+    <style name="Widget.GlassCard.Flat">
+        <item name="cardElevation">6dp</item>
+        <item name="cardCornerRadius">20dp</item>
+        <item name="android:foreground">@drawable/fg_glass_border_small</item>
+    </style>
+
+    <style name="Widget.IconTile">
+        <item name="android:layout_width">44dp</item>
+        <item name="android:layout_height">44dp</item>
+        <item name="android:background">@drawable/bg_icon_tile</item>
+    </style>
+
+    <!-- ============ controls ============ -->
+    <style name="Widget.Pill.Primary" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_pill_primary</item>
+        <item name="android:textColor">@color/on_accent</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">22dp</item>
+        <item name="android:paddingRight">22dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.Pill.Glass" parent="Widget.AppCompat.Button">
+        <item name="android:background">@drawable/bg_pill_glass</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:minHeight">56dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:paddingLeft">22dp</item>
+        <item name="android:paddingRight">22dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.Pill.Ghost" parent="Widget.Pill.Glass">
+        <item name="android:background">@drawable/bg_pill_ghost</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="Widget.Chip">
+        <item name="android:background">@drawable/bg_chip</item>
+        <item name="android:textColor">@color/text_chip</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:paddingLeft">18dp</item>
+        <item name="android:paddingRight">18dp</item>
+        <item name="android:minHeight">40dp</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="Widget.GlassField">
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_tertiary</item>
+        <item name="android:fontFamily">@font/poppins_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:paddingLeft">18dp</item>
+        <item name="android:paddingRight">18dp</item>
         <item name="android:paddingTop">14dp</item>
         <item name="android:paddingBottom">14dp</item>
-        <item name="android:paddingLeft">8dp</item>
-        <item name="android:paddingRight">0dp</item>
+        <item name="android:minHeight">52dp</item>
         <item name="android:singleLine">true</item>
-        <item name="android:textCursorDrawable">@drawable/cursor_oxide</item>
+        <item name="android:textCursorDrawable">@drawable/cursor_accent</item>
         <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="Widget.Key">
+        <item name="android:background">@drawable/bg_key</item>
+        <item name="android:textAppearance">@style/Text.Key</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:stateListAnimator">@null</item>
+    </style>
+
+    <style name="Widget.Key.Action">
+        <item name="android:background">@drawable/bg_key_action</item>
+        <item name="android:textAppearance">@style/Text.KeySmall</item>
+    </style>
+
+    <style name="Widget.Key.Accent">
+        <item name="android:background">@drawable/bg_key_accent</item>
+        <item name="android:textAppearance">@style/Text.Key</item>
+        <item name="android:textColor">@color/on_accent</item>
+    </style>
+
+    <style name="Widget.Fab">
+        <item name="android:layout_width">58dp</item>
+        <item name="android:layout_height">58dp</item>
+        <item name="android:background">@drawable/bg_fab</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:elevation">10dp</item>
+        <item name="android:stateListAnimator">@null</item>
     </style>
 
 </resources>

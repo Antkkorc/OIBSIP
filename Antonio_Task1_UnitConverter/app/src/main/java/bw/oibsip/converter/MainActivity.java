@@ -20,10 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
 /**
- * Instrument 01 — Converter.
- *
- * Layout thesis: legend gutter on the left, ruled rows down the middle, one ink readout
- * anchored to the bottom edge, one oxide action. Nothing is centred and nothing floats.
+ * Unit converter screen. Four glass chips choose the category, two spinners choose the
+ * units, and the result lands in a card at the bottom of the content.
  */
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +39,13 @@ public class MainActivity extends AppCompatActivity {
     private TextView resultValue;
     private TextView resultSentence;
     private TextView categoryNote;
-    private TextView[] tabs;
+    private TextView errorText;
+    private TextView[] chips;
+    private View header;
+    private View chipRow;
+    private View cardInput;
+    private View cardResult;
+    private View dock;
 
     private ConverterEngine.Category category = ConverterEngine.Category.LENGTH;
     private boolean hasResult;
@@ -50,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        GlassUi.install(this, R.layout.activity_main);
 
         inputValue = findViewById(R.id.inputValue);
         fromSpinner = findViewById(R.id.fromUnit);
@@ -58,16 +62,23 @@ public class MainActivity extends AppCompatActivity {
         resultValue = findViewById(R.id.resultValue);
         resultSentence = findViewById(R.id.resultSentence);
         categoryNote = findViewById(R.id.categoryNote);
-        tabs = new TextView[]{
-                findViewById(R.id.tabLength),
-                findViewById(R.id.tabWeight),
-                findViewById(R.id.tabVolume),
-                findViewById(R.id.tabTemp)
+        errorText = findViewById(R.id.errorText);
+        header = findViewById(R.id.header);
+        chipRow = findViewById(R.id.chipRow);
+        cardInput = findViewById(R.id.cardInput);
+        cardResult = findViewById(R.id.cardResult);
+        dock = findViewById(R.id.dock);
+
+        chips = new TextView[]{
+                findViewById(R.id.chipLength),
+                findViewById(R.id.chipWeight),
+                findViewById(R.id.chipVolume),
+                findViewById(R.id.chipTemp)
         };
 
-        for (int i = 0; i < tabs.length; i++) {
+        for (int i = 0; i < chips.length; i++) {
             final ConverterEngine.Category target = ConverterEngine.Category.values()[i];
-            tabs[i].setOnClickListener(new View.OnClickListener() {
+            chips[i].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (target != category) {
@@ -76,8 +87,14 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+        GlassUi.pressAll(chips);
 
-        findViewById(R.id.convertButton).setOnClickListener(new View.OnClickListener() {
+        View convertButton = findViewById(R.id.convertButton);
+        View swapButton = findViewById(R.id.swapButton);
+        GlassUi.press(convertButton);
+        GlassUi.press(swapButton);
+
+        convertButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 hideKeyboard();
@@ -85,14 +102,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.swapButton).setOnClickListener(new View.OnClickListener() {
+        swapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 swapUnits();
             }
         });
 
-        // Long press copies the readout — the one thing people actually want from a converter.
         resultValue.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
@@ -104,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 if (clipboard != null) {
                     clipboard.setPrimaryClip(
                             ClipData.newPlainText("Converted value", resultValue.getText()));
-                    toast(getString(R.string.toast_copied));
+                    Toast.makeText(MainActivity.this, R.string.toast_copied, Toast.LENGTH_SHORT).show();
                 }
                 return true;
             }
@@ -121,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                // Once a result exists the readout stays truthful: it re-converts silently.
+                hideError();
                 if (hasResult && !restoring) {
                     convert(false);
                 }
@@ -130,53 +146,58 @@ public class MainActivity extends AppCompatActivity {
 
         ConverterEngine.Category startCategory = ConverterEngine.Category.LENGTH;
         if (savedInstanceState != null) {
-            int ordinal = savedInstanceState.getInt(STATE_CATEGORY, 0);
-            startCategory = ConverterEngine.Category.values()[ordinal];
+            startCategory = ConverterEngine.Category.values()[
+                    savedInstanceState.getInt(STATE_CATEGORY, 0)];
         }
         selectCategory(startCategory, false);
 
         if (savedInstanceState != null) {
             restoring = true;
             inputValue.setText(savedInstanceState.getString(STATE_INPUT, ""));
-            int from = savedInstanceState.getInt(STATE_FROM, 0);
-            int to = savedInstanceState.getInt(STATE_TO, 1);
-            fromSpinner.setSelection(clamp(from, fromSpinner.getCount()));
-            toSpinner.setSelection(clamp(to, toSpinner.getCount()));
+            fromSpinner.setSelection(clamp(savedInstanceState.getInt(STATE_FROM, 0), fromSpinner.getCount()));
+            toSpinner.setSelection(clamp(savedInstanceState.getInt(STATE_TO, 1), toSpinner.getCount()));
             String result = savedInstanceState.getString(STATE_RESULT, null);
-            String sentence = savedInstanceState.getString(STATE_SENTENCE, null);
             if (result != null) {
                 resultValue.setText(result);
-                resultSentence.setText(sentence);
+                resultSentence.setText(savedInstanceState.getString(STATE_SENTENCE, null));
                 hasResult = true;
             }
             restoring = false;
         }
+
+        GlassUi.enter(header, 0L);
+        GlassUi.enter(chipRow, 60L);
+        GlassUi.enter(cardInput, 120L);
+        GlassUi.enter(cardResult, 180L);
+        GlassUi.enter(dock, 240L);
     }
 
     private static int clamp(int index, int count) {
         return Math.max(0, Math.min(index, Math.max(0, count - 1)));
     }
 
-    /** Rebuilds both spinners for a category, and clears the readout unless told not to. */
-    private void selectCategory(ConverterEngine.Category next, boolean resetReadout) {
+    /** Rebuilds both spinners for a category and clears the result card. */
+    private void selectCategory(ConverterEngine.Category next, boolean clearResult) {
         category = next;
-        for (int i = 0; i < tabs.length; i++) {
-            tabs[i].setSelected(i == next.ordinal());
+
+        for (int i = 0; i < chips.length; i++) {
+            chips[i].setSelected(i == next.ordinal());
         }
         categoryNote.setText(noteFor(next));
 
-        if (resetReadout) {
+        if (clearResult) {
             hasResult = false;
             resultValue.animate().cancel();
             resultValue.setAlpha(1f);
             resultValue.setText(R.string.result_placeholder);
             resultSentence.setText(R.string.awaiting);
+            hideError();
         }
 
         List<String> labels = ConverterEngine.menuLabels(next);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                this, R.layout.item_spinner_selected, labels);
-        adapter.setDropDownViewResource(R.layout.item_spinner_dropdown);
+                this, R.layout.item_unit_selected, labels);
+        adapter.setDropDownViewResource(R.layout.item_unit_dropdown);
 
         AdapterView.OnItemSelectedListener listener = new AdapterView.OnItemSelectedListener() {
             @Override
@@ -199,17 +220,17 @@ public class MainActivity extends AppCompatActivity {
         toSpinner.setSelection(labels.size() > 1 ? 1 : 0);
     }
 
-    private String noteFor(ConverterEngine.Category c) {
-        switch (c) {
+    private String noteFor(ConverterEngine.Category category) {
+        switch (category) {
             case WEIGHT:
-                return getString(R.string.category_weight_note);
+                return getString(R.string.note_weight);
             case VOLUME:
-                return getString(R.string.category_volume_note);
+                return getString(R.string.note_volume);
             case TEMPERATURE:
-                return getString(R.string.category_temp_note);
+                return getString(R.string.note_temp);
             case LENGTH:
             default:
-                return getString(R.string.category_length_note);
+                return getString(R.string.note_length);
         }
     }
 
@@ -229,15 +250,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * @param loud when true, validation problems are surfaced as Toasts. Silent re-converts
-     *             happen while typing and never interrupt.
+     * Converts the current input. When loud is true, problems are reported with a toast
+     * and a line under the result card. Silent conversions happen while typing.
      */
     private void convert(boolean loud) {
         String raw = inputValue.getText().toString().trim();
         if (raw.isEmpty()) {
             if (loud) {
-                toast(getString(R.string.toast_empty));
-                inputValue.requestFocus();
+                fail(getString(R.string.toast_empty));
             }
             return;
         }
@@ -247,15 +267,14 @@ public class MainActivity extends AppCompatActivity {
             value = ConverterEngine.parseInput(raw);
         } catch (NumberFormatException e) {
             if (loud) {
-                toast(getString(R.string.toast_nan));
-                inputValue.requestFocus();
+                fail(getString(R.string.toast_nan));
             }
             return;
         }
 
         if (Math.abs(value) > MAX_INPUT) {
             if (loud) {
-                toast(getString(R.string.toast_too_big));
+                fail(getString(R.string.toast_too_big));
             }
             return;
         }
@@ -271,32 +290,38 @@ public class MainActivity extends AppCompatActivity {
 
         if (ConverterEngine.belowAbsoluteZero(value, from)) {
             if (loud) {
-                toast(getString(R.string.toast_absolute_zero));
+                fail(getString(R.string.toast_absolute_zero));
             }
             return;
         }
 
         double converted = ConverterEngine.convert(value, from, to);
         String text = ConverterEngine.format(converted);
-
-        String sentence = ConverterEngine.sentence(value, from, to, text)
-                + "  ·  via " + ConverterEngine.baseName(category);
+        String sentence = ConverterEngine.sentence(value, from, to, text);
 
         boolean changed = !text.contentEquals(resultValue.getText());
         resultValue.setText(text);
         resultSentence.setText(sentence);
         hasResult = true;
+        hideError();
 
         if (changed) {
-            fadeReadout();
+            GlassUi.refresh(resultValue);
         }
     }
 
-    /** 120ms alpha settle — motion only because state changed. */
-    private void fadeReadout() {
-        resultValue.animate().cancel();
-        resultValue.setAlpha(0.25f);
-        resultValue.animate().alpha(1f).setDuration(120).start();
+    private void fail(String message) {
+        errorText.setText(message);
+        errorText.setVisibility(View.VISIBLE);
+        GlassUi.refresh(errorText);
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        inputValue.requestFocus();
+    }
+
+    private void hideError() {
+        if (errorText.getVisibility() == View.VISIBLE) {
+            errorText.setVisibility(View.GONE);
+        }
     }
 
     private void hideKeyboard() {
@@ -305,10 +330,6 @@ public class MainActivity extends AppCompatActivity {
         if (imm != null) {
             imm.hideSoftInputFromWindow(inputValue.getWindowToken(), 0);
         }
-    }
-
-    private void toast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -1,1311 +1,1478 @@
 /* =============================================================================
-   Gutter & Rule — interactive prototypes.
-   These are browser mirrors of the Android screens in Antonio_Task1…5.
-   The maths and the state machines are deliberately the same as the Java,
-   so this page doubles as a way to demo the UI before an APK is built.
+   Browser prototypes for the five OIBSIP Android apps.
+
+   Each phone mounts one module. The maths and state machines mirror the Java
+   versions closely enough to demo the screens, and everything is wired with
+   plain DOM calls so the file stays readable and dependency free.
    ============================================================================= */
+
 (function () {
   'use strict';
 
-  /* ---------------------------------------------------------------- helpers */
+  /* ------------------------------------------------------------------ helpers */
 
-  function h(html) {
-    var t = document.createElement('template');
-    t.innerHTML = html.trim();
-    return t.content.firstElementChild;
+  var ICON = {
+    converter:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>',
+    tasks:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.2" y="3.4" width="15.6" height="17.2" rx="4"/><path d="M8 8.6h8M8 12.2h8M8 15.8h4.6"/></svg>',
+    calculator:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4.6" y="3" width="14.8" height="18" rx="4.4"/><path d="M8.2 7.6h7.6"/><path d="M8.4 12h.01M12 12h.01M15.6 12h.01M8.4 16h.01M12 16h.01M15.6 16h.01"/></svg>',
+    quiz:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20.4 12.4c0 4.1-3.7 7.2-8.2 7.2-1 0-2-.15-2.9-.42L4.4 20.5l1.3-3.7c-1-1.2-1.6-2.7-1.6-4.4C4.1 8.3 7.8 5.2 12.2 5.2s8.2 3.1 8.2 7.2z"/><path d="M9.7 11.4a2.4 2.4 0 1 1 3.2 2.3v1"/><path d="M12.9 17.1h.01"/></svg>',
+    chrono:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13.4" r="7.4"/><path d="M12 10v3.6l2.4 1.6M9.6 3.4h4.8M12 3.4v2.6M18.9 7.1l1.3-1.3"/></svg>',
+    swap:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4.6L3.6 8 7 11.4M3.6 8h11.6M17 19.4L20.4 16 17 12.6M20.4 16H8.8"/></svg>',
+    plus:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"><path d="M12 5.5v13M5.5 12h13"/></svg>',
+    check:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 12.4l4.6 4.6L19.2 7.2"/></svg>',
+    trash:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.6 7.2h14.8M9.4 7.2V5.4h5.2v1.8M6.6 7.2l.9 11a2 2 0 0 0 2 1.9h5a2 2 0 0 0 2-1.9l.9-11"/></svg>',
+    close:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6.4 6.4l11.2 11.2M17.6 6.4L6.4 17.6"/></svg>',
+    backspace:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 5.4h9.4a2.4 2.4 0 0 1 2.4 2.4v8.4a2.4 2.4 0 0 1-2.4 2.4H9.2L2.9 12z"/><path d="M11.8 9.6l5 4.8M16.8 9.6l-5 4.8"/></svg>',
+    restart:
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.4 12a7.6 7.6 0 1 0 2.6-5.7"/><path d="M4.4 4.6V10h5.4"/></svg>'
+  };
+
+  function render(html) {
+    var tpl = document.createElement('template');
+    tpl.innerHTML = html.trim();
+    return tpl.content.firstElementChild;
   }
 
-  function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  function cash(root, selector) {
+    return root.querySelector(selector);
+  }
 
-  function groupInt(n) {
-    var neg = n.startsWith('-');
-    var body = neg ? n.slice(1) : n;
+  function pad2(n) {
+    return n < 10 ? '0' + n : String(n);
+  }
+
+  function toast(el) {
+    // Re-trigger the little fade each time a value changes.
+    el.classList.remove('fade-in');
+    void el.offsetWidth;
+    el.classList.add('fade-in');
+  }
+
+  /* ------------------------------------------------------------------ numbers */
+
+  function groupThousands(raw) {
+    var negative = raw.charAt(0) === '-';
+    var body = negative ? raw.slice(1) : raw;
     var dot = body.indexOf('.');
-    var int = dot < 0 ? body : body.slice(0, dot);
+    var whole = dot < 0 ? body : body.slice(0, dot);
     var frac = dot < 0 ? '' : body.slice(dot);
-    if (int.length > 3) int = int.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return (neg ? '-' : '') + int + frac;
-  }
-
-  /* Instrument formatting: 6dp max, grouping, scientific at the extremes. */
-  function fmt(v) {
-    if (!isFinite(v)) return '—';
-    var abs = Math.abs(v);
-    if (abs < 5e-7) return '0';
-    if (abs >= 1e12 || abs < 1e-6) {
-      return v.toExponential(6).toUpperCase().replace('E+', 'E+').replace('E-', 'E-');
+    if (whole.length > 3) {
+      whole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
-    var fixed = v.toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
-    return groupInt(fixed);
+    return (negative ? '-' : '') + whole + frac;
   }
 
-  function toast(screen, message) {
-    var old = screen.querySelector('.toast');
-    if (old) old.remove();
-    var node = h('<div class="toast">' + message + '</div>');
-    screen.appendChild(node);
-    requestAnimationFrame(function () { node.classList.add('on'); });
-    clearTimeout(node._t);
-    node._t = setTimeout(function () {
-      node.classList.remove('on');
-      setTimeout(function () { node.remove(); }, 200);
-    }, 2400);
-  }
-
-  /* Bottom sheet used for "new entry" and "confirm delete". */
-  function openSheet(screen, innerHtml, onMount) {
-    var mask = h('<div class="sheet-mask"><div class="sheet">' + innerHtml + '</div></div>');
-    screen.appendChild(mask);
-    requestAnimationFrame(function () { mask.classList.add('on'); });
-    function close() {
-      mask.classList.remove('on');
-      setTimeout(function () { mask.remove(); }, 140);
+  /* Six decimals at most, scientific at the extremes, same as ConverterEngine. */
+  function tidy(value) {
+    if (!isFinite(value)) {
+      return 'Out of range';
     }
-    mask.addEventListener('click', function (e) {
-      if (e.target === mask) close();
+    var abs = Math.abs(value);
+    if (abs === 0) {
+      return '0';
+    }
+    if (abs >= 1e12 || abs < 1e-9) {
+      return value.toExponential(6);
+    }
+    var text = value.toFixed(6).replace(/0+$/, '').replace(/\.$/, '');
+    return groupThousands(text);
+  }
+
+  /* ------------------------------------------------------------------ apps */
+
+  var mount = {
+    converter: mountConverter,
+    tasks: mountTasks,
+    calculator: mountCalculator,
+    quiz: mountQuiz,
+    stopwatch: mountStopwatch
+  };
+
+  function bootPhones() {
+    document.querySelectorAll('.phone[data-app]').forEach(function (phone) {
+      var name = phone.getAttribute('data-app');
+      var screen = render(
+        '<div class="screen">' +
+          '<div class="statusbar">' +
+            '<span>9:41</span>' +
+            '<span class="bars"><i></i><i></i><i></i><span class="battery"></span></span>' +
+          '</div>' +
+          '<div class="app"></div>' +
+        '</div>'
+      );
+      phone.appendChild(screen);
+      if (mount[name]) {
+        mount[name](cash(screen, '.app'));
+      }
     });
-    onMount(mask.querySelector('.sheet'), close);
-    return close;
   }
 
-  function stamp(ms) {
-    var d = new Date(ms);
-    var months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return pad2(d.getDate()) + ' ' + months[d.getMonth()] + ' · ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
-  }
+  /* ================================================================= converter */
 
-  function fitReadout(node, text, max, min) {
-    var size = max;
-    node.style.fontSize = size + 'px';
-    while (size > min && node.scrollWidth > node.clientWidth) {
-      size -= 2;
-      node.style.fontSize = size + 'px';
-    }
-  }
-
-  /* =============================================================================
-     01 · CONVERTER
-     ========================================================================== */
-
-  var CONVERTER = {
-    id: 'converter',
-    number: '01',
-    name: 'Converter',
-    spec: 'Task 1 · Java + XML · 26 units',
-    edges: [
-      'Empty or non-numeric input → toast',
-      'Below absolute zero → refused',
-      'Huge values → scientific readout',
-      'Category switch resets both spinners',
-      'Swap re-converts without a tap'
-    ],
-    mount: function (screen) {
-      var cats = [
-        {
-          label: 'Length', note: '8 units · metric ↔ imperial · base: metre', base: 'metre',
-          units: [['Millimetre', 'mm', 0.001], ['Centimetre', 'cm', 0.01], ['Metre', 'm', 1], ['Kilometre', 'km', 1000],
-                  ['Inch', 'in', 0.0254], ['Foot', 'ft', 0.3048], ['Yard', 'yd', 0.9144], ['Mile', 'mi', 1609.344]]
-        },
-        {
-          label: 'Weight', note: '7 units · avoirdupois ↔ metric · base: gram', base: 'gram',
-          units: [['Milligram', 'mg', 0.001], ['Gram', 'g', 1], ['Kilogram', 'kg', 1000], ['Tonne', 't', 1000000],
-                  ['Ounce', 'oz', 28.349523125], ['Pound', 'lb', 453.59237], ['Stone', 'st', 6350.29318]]
-        },
-        {
-          label: 'Volume', note: '8 units · SI ↔ US customary · base: litre', base: 'litre',
-          units: [['Millilitre', 'mL', 0.001], ['Litre', 'L', 1], ['Cubic metre', 'm³', 1000], ['US gallon', 'US gal', 3.785411784],
-                  ['US quart', 'US qt', 0.946352946], ['US pint', 'US pt', 0.473176473], ['US fluid ounce', 'US fl oz', 0.0295735295625],
-                  ['US cup', 'US cup', 0.2365882365]]
-        },
-        {
-          label: 'Temp', note: '3 scales · absolute zero at −273.15 °C', base: 'celsius',
-          units: [['Celsius', '°C', 1], ['Fahrenheit', '°F', 1], ['Kelvin', 'K', 1]]
-        }
-      ];
-
-      var cat = 0, from = 0, to = 1, hasResult = false;
-
-      screen.innerHTML =
-        '<div class="s-hdr">' +
-          '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 01</span><span class="legend">Rev 1.0</span></div>' +
-          '<hr class="rule rule--ink">' +
-          '<h3 class="s-title">Converter</h3>' +
-          '<p class="s-standfirst">Length, weight, volume, temperature. Twenty-six units in one ruled column, and no rounding tricks you did not ask for.</p>' +
-        '</div>' +
-        '<div class="tabs" role="tablist" data-tabs></div>' +
-        '<div data-cat-note class="legend" style="padding:10px 16px 0"></div>' +
-        '<div class="scroll">' +
-          '<div class="row"><span class="legend gutter">01 / Value</span>' +
-            '<input class="field" data-input inputmode="decimal" placeholder="enter a number" aria-label="Value to convert"></div>' +
-          '<div class="row"><span class="legend gutter">02 / From</span><select class="field" data-from aria-label="Source unit"></select></div>' +
-          '<div class="row"><span class="legend gutter">03 / To</span><select class="field" data-to aria-label="Target unit"></select></div>' +
-          '<div class="row row--tight" style="border-bottom:0;justify-content:flex-end"><button class="btn-quiet" data-swap style="padding-right:0">Swap from / to</button></div>' +
-          '<p class="colophon-line" style="padding:0 16px">SI base units · 1 in = 2.54 cm exact · 1 lb = 453.59237 g</p>' +
-        '</div>' +
-        '<div class="readout readout--converter">' +
-          '<div class="readout-row"><span class="legend">Converted value</span><span class="legend" data-stale></span></div>' +
-          '<p class="readout-value" data-result>—</p>' +
-          '<hr class="readout-rule">' +
-          '<p class="readout-note" data-sentence>Awaiting a value. Type a number, pick two units, then press convert.</p>' +
-        '</div>' +
-        '<div class="foot"><button class="cta" data-convert>Convert</button></div>';
-
-      var tabs = screen.querySelector('[data-tabs]');
-      var note = screen.querySelector('[data-cat-note]');
-      var input = screen.querySelector('[data-input]');
-      var fromSel = screen.querySelector('[data-from]');
-      var toSel = screen.querySelector('[data-to]');
-      var result = screen.querySelector('[data-result]');
-      var sentence = screen.querySelector('[data-sentence]');
-      var stale = screen.querySelector('[data-stale]');
-
-      cats.forEach(function (c, i) {
-        tabs.appendChild(h('<button class="tab" role="tab" aria-selected="' + (i === 0) + '">' + c.label + '</button>'));
-      });
-
-      function fillSelects() {
-        var c = cats[cat];
-        [fromSel, toSel].forEach(function (sel, which) {
-          sel.innerHTML = '';
-          c.units.forEach(function (u, i) {
-            var o = document.createElement('option');
-            o.value = String(i);
-            o.textContent = u[0] + ' · ' + u[1];
-            sel.appendChild(o);
-          });
-          sel.value = String(which === 0 ? from : to);
-        });
-      }
-
-      function toCelsius(v, sym) {
-        if (sym === '°F') return (v - 32) * 5 / 9;
-        if (sym === 'K') return v - 273.15;
-        return v;
-      }
-      function fromCelsius(c, sym) {
-        if (sym === '°F') return c * 9 / 5 + 32;
-        if (sym === 'K') return c + 273.15;
-        return c;
-      }
-
-      function convert(loud) {
-        var raw = input.value.trim();
-        if (!raw) {
-          if (loud) toast(screen, 'Enter a value to convert.');
-          return;
-        }
-        var cleaned = raw.replace(/\s/g, '');
-        if (cleaned.indexOf('.') < 0 && cleaned.indexOf(',') >= 0) cleaned = cleaned.replace(',', '.');
-        else cleaned = cleaned.replace(/,/g, '');
-        if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(cleaned)) {
-          if (loud) toast(screen, 'That is not a number.');
-          return;
-        }
-        var value = parseFloat(cleaned);
-        if (Math.abs(value) > 1e15) {
-          if (loud) toast(screen, 'Too large to convert reliably. Keep it under 1 × 10¹⁵.');
-          return;
-        }
-        var c = cats[cat];
-        var a = c.units[from], b = c.units[to];
-        var out;
-        if (cat === 3) {
-          var celsius = toCelsius(value, a[1]);
-          if (celsius < -273.15 - 1e-9) {
-            if (loud) toast(screen, 'Below absolute zero. −273.15 °C is the floor.');
-            return;
-          }
-          out = fromCelsius(celsius, b[1]);
-        } else {
-          out = value * a[2] / b[2];
-        }
-        var text = fmt(out);
-        var changed = result.textContent !== text;
-        result.textContent = text;
-        fitReadout(result, text, 34, 16);
-        sentence.textContent = fmt(value).toUpperCase() + ' ' + a[1].toUpperCase() + '  =  ' +
-          text + ' ' + b[1].toUpperCase() + '  ·  via ' + c.base;
-        stale.textContent = 'Exact';
-        hasResult = true;
-        if (changed) {
-          result.style.opacity = '0.25';
-          requestAnimationFrame(function () { result.style.opacity = '1'; });
-        }
-      }
-
-      function selectCategory(next) {
-        cat = next;
-        from = 0;
-        to = cats[cat].units.length > 1 ? 1 : 0;
-        Array.prototype.forEach.call(tabs.children, function (t, i) {
-          t.setAttribute('aria-selected', String(i === cat));
-        });
-        note.textContent = cats[cat].note;
-        fillSelects();
-        hasResult = false;
-        result.textContent = '—';
-        result.style.fontSize = '34px';
-        stale.textContent = '';
-        sentence.textContent = 'Awaiting a value. Type a number, pick two units, then press convert.';
-        input.value = '';
-      }
-
-      Array.prototype.forEach.call(tabs.children, function (tab, i) {
-        tab.addEventListener('click', function () { if (i !== cat) selectCategory(i); });
-      });
-
-      screen.querySelector('[data-convert]').addEventListener('click', function () { convert(true); });
-      screen.querySelector('[data-swap]').addEventListener('click', function () {
-        var a = from; from = to; to = a;
-        fromSel.value = String(from);
-        toSel.value = String(to);
-        if (hasResult) convert(false);
-      });
-      fromSel.addEventListener('change', function () { from = Number(fromSel.value); if (hasResult) convert(false); });
-      toSel.addEventListener('change', function () { to = Number(toSel.value); if (hasResult) convert(false); });
-      input.addEventListener('input', function () { if (hasResult) convert(false); });
-      input.addEventListener('keydown', function (e) { if (e.key === 'Enter') convert(true); });
-
-      selectCategory(0);
-      input.value = '250';
-      from = 1; to = 4;
-      fromSel.value = '1'; toSel.value = '4';
-      convert(false);
+  var CATEGORIES = {
+    Length: {
+      note: '8 units. Metric and imperial.',
+      units: [
+        ['Millimetre', 0.001, 'mm'],
+        ['Centimetre', 0.01, 'cm'],
+        ['Metre', 1, 'm'],
+        ['Kilometre', 1000, 'km'],
+        ['Inch', 0.0254, 'in'],
+        ['Foot', 0.3048, 'ft'],
+        ['Yard', 0.9144, 'yd'],
+        ['Mile', 1609.344, 'mi']
+      ]
+    },
+    Weight: {
+      note: '7 units. Metric and imperial.',
+      units: [
+        ['Milligram', 0.001, 'mg'],
+        ['Gram', 1, 'g'],
+        ['Kilogram', 1000, 'kg'],
+        ['Ounce', 28.349523125, 'oz'],
+        ['Pound', 453.59237, 'lb'],
+        ['Stone', 6350.29318, 'st'],
+        ['Tonne', 1000000, 't']
+      ]
+    },
+    Volume: {
+      note: '8 units. Metric and US customary.',
+      units: [
+        ['Millilitre', 0.001, 'ml'],
+        ['Litre', 1, 'l'],
+        ['Cubic metre', 1000, 'm\u00B3'],
+        ['Teaspoon', 0.00492892159375, 'tsp'],
+        ['Tablespoon', 0.01478676478125, 'tbsp'],
+        ['Fluid ounce', 0.0295735295625, 'fl oz'],
+        ['Cup', 0.2365882365, 'cup'],
+        ['Gallon', 3.785411784, 'gal']
+      ]
+    },
+    Temperature: {
+      note: '3 scales. Celsius, Fahrenheit and Kelvin.',
+      units: [['Celsius', 0, '\u00B0C'], ['Fahrenheit', 0, '\u00B0F'], ['Kelvin', 0, 'K']]
     }
   };
 
-  /* =============================================================================
-     02 · LEDGER  (accounts + SQLite-shaped task table, stored in localStorage here)
-     ========================================================================== */
+  function symbolOf(category, name) {
+    var found = CATEGORIES[category].units.filter(function (u) { return u[0] === name; })[0];
+    return found ? found[2] : name;
+  }
 
-  var Ledger = {
-    KEY: 'gr.ledger.v3',
+  function toCelsius(value, unit) {
+    if (unit === 'Fahrenheit') {
+      return (value - 32) * 5 / 9;
+    }
+    if (unit === 'Kelvin') {
+      return value - 273.15;
+    }
+    return value;
+  }
 
-    load: function () {
-      try {
-        var raw = JSON.parse(localStorage.getItem(this.KEY));
-        if (raw && raw.users && raw.tasks) return raw;
-      } catch (e) { /* fall through */ }
-      return { users: [], tasks: [], session: null, nextTask: 1 };
-    },
-    save: function (db) { localStorage.setItem(this.KEY, JSON.stringify(db)); },
+  function fromCelsius(value, unit) {
+    if (unit === 'Fahrenheit') {
+      return value * 9 / 5 + 32;
+    }
+    if (unit === 'Kelvin') {
+      return value + 273.15;
+    }
+    return value;
+  }
 
-    salt: function () {
-      var bytes = new Uint8Array(16);
-      (window.crypto || {}).getRandomValues ? window.crypto.getRandomValues(bytes) : bytes.forEach(function (_, i) { bytes[i] = Math.floor(Math.random() * 256); });
-      return Array.prototype.map.call(bytes, function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-    },
+  function convertValue(value, category, fromName, toName) {
+    if (category === 'Temperature') {
+      return fromCelsius(toCelsius(value, fromName), toName);
+    }
+    var list = CATEGORIES[category].units;
+    var from = list.filter(function (u) { return u[0] === fromName; })[0][1];
+    var to = list.filter(function (u) { return u[0] === toName; })[0][1];
+    return value * from / to;
+  }
 
-    hash: function (password, salt) {
-      var text = salt + ':' + password;
-      if (window.crypto && window.crypto.subtle && window.crypto.subtle.digest) {
-        return window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text)).then(function (buf) {
-          return Array.prototype.map.call(new Uint8Array(buf), function (b) { return b.toString(16).padStart(2, '0'); }).join('');
-        });
+  function parseInput(raw) {
+    var text = raw.trim();
+    if (!text) {
+      return null;
+    }
+    if (text.indexOf(',') > -1 && text.indexOf('.') < 0) {
+      text = text.replace(',', '.');
+    } else {
+      text = text.replace(/,/g, '');
+    }
+    if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(text)) {
+      return null;
+    }
+    return parseFloat(text);
+  }
+
+  function mountConverter(root) {
+    var state = {
+      category: 'Length',
+      from: 'Centimetre',
+      to: 'Inch',
+      hasResult: false
+    };
+
+    root.innerHTML =
+      '<header class="app-head">' +
+        '<span class="tile">' + ICON.converter + '</span>' +
+        '<div><div class="app-title">Converter</div>' +
+        '<div class="app-sub">Length, weight, volume and temperature</div></div>' +
+      '</header>' +
+      '<div class="row-of-chips" style="margin-top:14px">' +
+        Object.keys(CATEGORIES).map(function (name) {
+          return '<button class="chip" type="button" data-cat="' + name + '">' + name + '</button>';
+        }).join('') +
+      '</div>' +
+      '<div class="card" style="margin-top:12px">' +
+        '<p class="label">Value</p>' +
+        '<input class="field" data-value inputmode="decimal" placeholder="Enter a number" style="margin-top:6px" />' +
+        '<div class="conv-pair">' +
+          '<div class="conv-side"><p class="label">From</p><select class="field" data-from></select></div>' +
+          '<button class="iconbtn" type="button" data-swap aria-label="Swap units">' + ICON.swap + '</button>' +
+          '<div class="conv-side"><p class="label">To</p><select class="field" data-to></select></div>' +
+        '</div>' +
+        '<p class="label" data-note style="margin-top:11px;text-transform:none;letter-spacing:.02em"></p>' +
+      '</div>' +
+      '<div class="card result-card">' +
+        '<p class="label">Result</p>' +
+        '<div class="result-value" data-result>0</div>' +
+        '<div class="result-line" data-sentence>Enter a value and press Convert.</div>' +
+      '</div>' +
+      '<p class="errorline" data-error></p>' +
+      '<div class="dock">' +
+        '<button class="pill pill--primary pill--block" type="button" data-convert>Convert</button>' +
+      '</div>';
+
+    var input = cash(root, '[data-value]');
+    var fromSel = cash(root, '[data-from]');
+    var toSel = cash(root, '[data-to]');
+    var result = cash(root, '[data-result]');
+    var sentence = cash(root, '[data-sentence]');
+    var note = cash(root, '[data-note]');
+    var error = cash(root, '[data-error]');
+
+    function units() {
+      return CATEGORIES[state.category].units.map(function (u) { return u[0]; });
+    }
+
+    function fillSelects() {
+      var list = units();
+      fromSel.innerHTML = list.map(function (n) { return '<option>' + n + '</option>'; }).join('');
+      toSel.innerHTML = fromSel.innerHTML;
+      fromSel.value = state.from;
+      toSel.value = state.to;
+    }
+
+    function paintChips() {
+      Array.prototype.forEach.call(root.querySelectorAll('[data-cat]'), function (chip) {
+        chip.setAttribute('aria-pressed', String(chip.getAttribute('data-cat') === state.category));
+      });
+    }
+
+    function convert(loud) {
+      error.textContent = '';
+      var raw = input.value;
+      if (!raw.trim()) {
+        if (loud) {
+          error.textContent = 'Enter a value to convert.';
+        }
+        return;
       }
-      var h1 = 0x811c9dc5;
-      for (var i = 0; i < text.length; i++) { h1 ^= text.charCodeAt(i); h1 = (h1 * 0x01000193) >>> 0; }
-      return Promise.resolve('fnv' + h1.toString(16));
-    },
+      var value = parseInput(raw);
+      if (value === null) {
+        if (loud) {
+          error.textContent = 'That is not a number.';
+        }
+        return;
+      }
+      if (Math.abs(value) > 1e15) {
+        if (loud) {
+          error.textContent = 'That number is too large to convert.';
+        }
+        return;
+      }
+      if (state.category === 'Temperature' && toCelsius(value, state.from) < -273.15 - 1e-9) {
+        if (loud) {
+          error.textContent = 'Below absolute zero. The lowest temperature is -273.15 °C.';
+        }
+        return;
+      }
 
-    seedDemo: function (db) {
-      var self = this;
-      var email = 'antonio@oibsip.demo';
-      if (db.users.some(function (u) { return u.email === email; })) return Promise.resolve(db);
-      var salt = this.salt();
-      var now = Date.now();
-      return this.hash('demo-passphrase', salt).then(function (digest) {
-      db.users.push({ id: db.users.length + 1, name: 'Antonio', email: email, salt: salt, hash: digest, created: now });
-      var rows = [
-        ['Measure the lab bench and convert to imperial', 'Bench A is 183 cm by 74 cm. Convert both, then check against the cutting list before Saturday.', 0],
-        ['Lap times for the 400 m set', '', 0],
-        ['Read the SQLite docs on foreign keys', 'The ledger table uses ON DELETE CASCADE so deleting an account cannot leave orphaned entries behind.', 0],
-        ['Rotate the phone mid-quiz without reshuffling', 'The deck is dealt from a stored seed, so onSaveInstanceState can re-deal the identical order after a configuration change.', 1],
-        ['A deliberately long title that has to ellipsize rather than push the delete button off the row, because real task lists contain sentences, not labels', '', 0]
-      ];
-      rows.forEach(function (r, i) {
+      var out = convertValue(value, state.category, state.from, state.to);
+      result.textContent = tidy(out);
+      sentence.textContent = tidy(value) + ' ' + symbolOf(state.category, state.from) +
+        ' = ' + tidy(out) + ' ' + symbolOf(state.category, state.to);
+      state.hasResult = true;
+      toast(result);
+    }
+
+    function setCategory(name) {
+      if (state.category === name) {
+        return;
+      }
+      state.category = name;
+      var list = units();
+      state.from = list[0];
+      state.to = list[1];
+      state.hasResult = false;
+      result.textContent = '0';
+      sentence.textContent = 'Enter a value and press Convert.';
+      error.textContent = '';
+      note.textContent = CATEGORIES[name].note;
+      paintChips();
+      fillSelects();
+      toast(result);
+    }
+
+    Array.prototype.forEach.call(root.querySelectorAll('[data-cat]'), function (chip) {
+      chip.addEventListener('click', function () {
+        setCategory(chip.getAttribute('data-cat'));
+      });
+    });
+
+    fromSel.addEventListener('change', function () {
+      state.from = fromSel.value;
+      if (state.hasResult) {
+        convert(false);
+      }
+    });
+    toSel.addEventListener('change', function () {
+      state.to = toSel.value;
+      if (state.hasResult) {
+        convert(false);
+      }
+    });
+
+    cash(root, '[data-swap]').addEventListener('click', function () {
+      var held = state.from;
+      state.from = state.to;
+      state.to = held;
+      fromSel.value = state.from;
+      toSel.value = state.to;
+      if (state.hasResult) {
+        convert(false);
+      }
+    });
+
+    input.addEventListener('input', function () {
+      error.textContent = '';
+      if (state.hasResult) {
+        convert(false);
+      }
+    });
+    input.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter') {
+        convert(true);
+      }
+    });
+
+    cash(root, '[data-convert]').addEventListener('click', function () {
+      convert(true);
+    });
+
+    note.textContent = CATEGORIES[state.category].note;
+    paintChips();
+    fillSelects();
+  }
+
+  /* ===================================================================== tasks */
+
+  function mountTasks(root) {
+    var db = {
+      users: {},
+      tasks: [],
+      nextTaskId: 1,
+      session: null,
+      view: 'login',
+      filter: 'All'
+    };
+
+    function stamp(at) {
+      var d = new Date(at);
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return d.getDate() + ' ' + months[d.getMonth()] + ', ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+
+    function mine() {
+      return db.tasks.filter(function (t) {
+        return t.owner === db.session;
+      });
+    }
+
+    function counts() {
+      var list = mine();
+      var done = list.filter(function (t) { return t.done; }).length;
+      return { open: list.length - done, done: done };
+    }
+
+    function visible() {
+      return mine().filter(function (t) {
+        if (db.filter === 'Open') { return !t.done; }
+        if (db.filter === 'Done') { return t.done; }
+        return true;
+      }).sort(function (a, b) {
+        if (a.done !== b.done) { return a.done ? 1 : -1; }
+        return b.at - a.at;
+      });
+    }
+
+    function normalise(email) {
+      return email.trim().toLowerCase();
+    }
+
+    function seedDemo() {
+      var email = 'demo@example.com';
+      if (db.users[email]) {
+        return email;
+      }
+      db.users[email] = { name: 'Antonio', password: 'oibsip1234' };
+      [
+        ['Finish the quiz screen', 'Check the note line under the options'],
+        ['Water the plants', ''],
+        ['Read for twenty minutes', '']
+      ].forEach(function (pair, i) {
         db.tasks.push({
-          id: db.nextTask++, user: db.users[db.users.length - 1].id, title: r[0], notes: r[1], done: r[2],
-          created: now - (i + 1) * 3600000, completed: r[2] ? now - 900000 : null
+          id: db.nextTaskId++,
+          owner: email,
+          title: pair[0],
+          note: pair[1],
+          done: i === 2,
+          at: Date.now() - (i + 1) * 3600000
         });
       });
-      return db;
+      return email;
+    }
+
+    function shell(body) {
+      root.innerHTML = body;
+    }
+
+    function signIn(email, password) {
+      var key = normalise(email);
+      var account = db.users[key];
+      if (!account || account.password !== password) {
+        return false;
+      }
+      db.session = key;
+      db.view = 'list';
+      db.filter = 'All';
+      renderList();
+      return true;
+    }
+
+    function renderLogin(message) {
+      db.view = 'login';
+      shell(
+        '<div class="screen-views">' +
+          '<div class="auth-head">' +
+            '<span class="tile" style="width:52px;height:52px">' + ICON.tasks + '</span>' +
+            '<h1 class="auth-title">Welcome back</h1>' +
+            '<p class="auth-sub">Sign in to open your list.</p>' +
+          '</div>' +
+          '<div class="card auth-form">' +
+            '<div><p class="label">Email</p>' +
+              '<input class="field" data-email type="email" placeholder="you@example.com" style="margin-top:5px" /></div>' +
+            '<div><p class="label">Password</p>' +
+              '<input class="field" data-password type="password" placeholder="Your password" style="margin-top:5px" /></div>' +
+            '<p class="errorline" data-error style="margin-top:0">' + (message || '') + '</p>' +
+            '<button class="pill pill--primary pill--block" type="button" data-signin>Sign in</button>' +
+          '</div>' +
+          '<button class="plain-link" type="button" data-register>New here? Create an account</button>' +
+          '<p style="font-size:11px;color:var(--ink-faint);text-align:center;margin-top:auto">' +
+            'Demo account: <strong>demo@example.com</strong> / <strong>oibsip1234</strong></p>' +
+        '</div>'
+      );
+
+      var emailField = cash(root, '[data-email]');
+      var passwordField = cash(root, '[data-password]');
+      var error = cash(root, '[data-error]');
+
+      function submit() {
+        var email = emailField.value;
+        var password = passwordField.value;
+        if (!email.trim()) {
+          error.textContent = 'Enter your email.';
+          return;
+        }
+        if (!password) {
+          error.textContent = 'Enter your password.';
+          return;
+        }
+        if (!signIn(email, password)) {
+          error.textContent = 'Email or password is incorrect.';
+          passwordField.value = '';
+        }
+      }
+
+      cash(root, '[data-signin]').addEventListener('click', submit);
+      passwordField.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') { submit(); }
+      });
+      cash(root, '[data-register]').addEventListener('click', function () {
+        renderRegister();
       });
     }
-  };
 
-  var LEDGER = {
-    id: 'ledger',
-    number: '02',
-    name: 'Ledger',
-    spec: 'Task 2 · Java + SQLite · PBKDF2',
-    edges: [
-      'Empty ledger, per filter',
-      '120-character titles ellipsize',
-      'Salted hash, never plaintext',
-      'Delete confirms, then is permanent',
-      'Log out clears the session'
-    ],
-    mount: function (screen) {
-      var db = Ledger.load();
-      var filter = 'ALL';
-      var errorText = '';
-
-      function me() {
-        return db.users.filter(function (u) { return u.id === db.session; })[0] || null;
-      }
-
-      function tasksFor(user, mode) {
-        return db.tasks
-          .filter(function (t) { return t.user === user.id && (mode === 'ALL' || (mode === 'OPEN' ? !t.done : t.done)); })
-          .sort(function (a, b) {
-            if (a.done !== b.done) return a.done ? 1 : -1;
-            return (b.completed || b.created) - (a.completed || a.created);
-          });
-      }
-
-      /* ---------------- sign in ---------------- */
-
-      function renderLogin() {
-        screen.innerHTML =
-          '<div class="s-hdr">' +
-            '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 02</span><span class="legend">Rev 1.0</span></div>' +
-            '<hr class="rule rule--ink">' +
-            '<h3 class="s-title">The Ledger</h3>' +
-            '<p class="s-standfirst">One account, one list, kept on this device. Sign in to pick up where you stopped.</p>' +
+    function renderRegister(message) {
+      db.view = 'register';
+      shell(
+        '<div class="screen-views">' +
+          '<div class="auth-head">' +
+            '<h1 class="auth-title" style="margin-top:0">Create account</h1>' +
+            '<p class="auth-sub">Each account keeps its own tasks on this phone.</p>' +
           '</div>' +
-          '<div class="scroll"><div class="auth">' +
-            '<div class="auth-fields">' +
-              '<div class="row" style="padding:0"><span class="legend gutter">01 / Email</span><input class="field" data-email placeholder="you@example.com" autocomplete="username"></div>' +
-              '<div class="row" style="padding:0"><span class="legend gutter">02 / Password</span><input class="field" type="password" data-password placeholder="your password" autocomplete="current-password"></div>' +
-            '</div>' +
-            '<p class="error-line" data-error style="padding:12px 0 0;' + (errorText ? '' : 'display:none') + '">' + errorText + '</p>' +
-            '<button class="cta" data-signin style="margin-top:18px">Sign in</button>' +
-            '<div class="link-row"><button class="btn-quiet" data-register>No account? Register</button></div>' +
-            '<div class="link-row"><button class="btn-quiet" data-demo style="color:var(--oxide)">Use the demo account</button></div>' +
-            '<p class="colophon-line">PBKDF2-SHA256 · 120,000 iterations · one salt per account · session in shared preferences</p>' +
-          '</div></div>';
+          '<div class="card auth-form">' +
+            '<div><p class="label">Name</p>' +
+              '<input class="field" data-name placeholder="Your name" style="margin-top:5px" /></div>' +
+            '<div><p class="label">Email</p>' +
+              '<input class="field" data-email type="email" placeholder="you@example.com" style="margin-top:5px" /></div>' +
+            '<div><p class="label">Password</p>' +
+              '<input class="field" data-password type="password" placeholder="At least 8 characters" style="margin-top:5px" /></div>' +
+            '<div><p class="label">Confirm password</p>' +
+              '<input class="field" data-confirm type="password" placeholder="Type it again" style="margin-top:5px" /></div>' +
+            '<p class="errorline" data-error style="margin-top:0">' + (message || '') + '</p>' +
+            '<button class="pill pill--primary pill--block" type="button" data-create>Create account</button>' +
+          '</div>' +
+          '<button class="plain-link" type="button" data-back>Already have an account? Sign in</button>' +
+        '</div>'
+      );
 
-        var email = screen.querySelector('[data-email]');
-        var password = screen.querySelector('[data-password]');
-        var error = screen.querySelector('[data-error]');
+      var error = cash(root, '[data-error]');
+      var name = cash(root, '[data-name]');
+      var email = cash(root, '[data-email]');
+      var password = cash(root, '[data-password]');
+      var confirm = cash(root, '[data-confirm]');
 
-        function fail(msg) {
-          error.style.display = 'block';
-          error.textContent = msg;
-          errorText = msg;
+      cash(root, '[data-create]').addEventListener('click', function () {
+        var key = normalise(email.value);
+        if (!name.value.trim()) {
+          error.textContent = 'Enter your name.';
+          return;
         }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(key)) {
+          error.textContent = 'That email does not look right.';
+          return;
+        }
+        if (password.value.length < 8) {
+          error.textContent = 'Use at least 8 characters.';
+          return;
+        }
+        if (password.value !== confirm.value) {
+          error.textContent = 'The passwords do not match.';
+          return;
+        }
+        if (db.users[key]) {
+          error.textContent = 'That email is already registered.';
+          return;
+        }
+        db.users[key] = { name: name.value.trim(), password: password.value };
+        db.session = key;
+        renderList();
+      });
 
-        screen.querySelector('[data-signin]').addEventListener('click', function () {
-          if (!email.value.trim() || !password.value) { fail('Both fields are required.'); return; }
-          var user = db.users.filter(function (u) {
-            return u.email === email.value.trim().toLowerCase();
-          })[0];
-          var attempted = password.value;
-          if (!user) {
-            /* same message and same work either way: never confirm which half was wrong */
-            Ledger.hash(attempted, 'no-such-account').then(function () {
-              fail('No account matches that email and password.');
-            });
-            return;
-          }
-          Ledger.hash(attempted, user.salt).then(function (digest) {
-            var ok = user.hash === digest;
-            if (!ok) { fail('No account matches that email and password.'); password.value = ''; return; }
-            db.session = user.id;
-            Ledger.save(db);
-            errorText = '';
-            renderTasks();
-          });
-        });
+      cash(root, '[data-back]').addEventListener('click', function () {
+        renderLogin();
+      });
+    }
 
-        screen.querySelector('[data-register]').addEventListener('click', function () { errorText = ''; renderRegister(); });
+    function renderList() {
+      db.view = 'list';
+      var account = db.users[db.session] || { name: 'You' };
+      var c = counts();
+      var list = visible();
 
-        screen.querySelector('[data-demo]').addEventListener('click', function () {
-          Ledger.seedDemo(db).then(function (seeded) {
-            db = seeded;
-            var demo = db.users.filter(function (u) { return u.email === 'antonio@oibsip.demo'; })[0];
-            db.session = demo.id;
-            Ledger.save(db);
-            filter = 'ALL';
-            errorText = '';
-            renderTasks();
-          });
-        });
-
-        password.addEventListener('keydown', function (e) { if (e.key === 'Enter') screen.querySelector('[data-signin]').click(); });
-      }
-
-      /* ---------------- register ---------------- */
-
-      function renderRegister() {
-        screen.innerHTML =
-          '<div class="s-hdr">' +
-            '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 02</span><span class="legend">Rev 1.0</span></div>' +
-            '<hr class="rule rule--ink">' +
-            '<h3 class="s-title">Open an account</h3>' +
-            '<p class="s-standfirst">Your name and email live in the app database. The password is salted and hashed before it is stored, never written as text.</p>' +
-          '</div>' +
-          '<div class="scroll"><div class="auth">' +
-            '<div class="auth-fields">' +
-              '<div class="row" style="padding:0"><span class="legend gutter">01 / Name</span><input class="field" data-name placeholder="what should the page say"></div>' +
-              '<div class="row" style="padding:0"><span class="legend gutter">02 / Email</span><input class="field" data-email placeholder="you@example.com"></div>' +
-              '<div class="row" style="padding:0"><span class="legend gutter">03 / Password</span><input class="field" type="password" data-password placeholder="at least 8 characters"></div>' +
-            '</div>' +
-            '<p class="error-line" data-error style="padding:12px 0 0;display:none"></p>' +
-            '<button class="cta" data-create style="margin-top:18px">Create account</button>' +
-            '<div class="link-row"><button class="btn-quiet" data-back>Already registered? Sign in</button></div>' +
-            '<p class="colophon-line">Salted + hashed · nothing leaves this browser · no network calls</p>' +
-          '</div></div>';
-
-        var name = screen.querySelector('[data-name]');
-        var email = screen.querySelector('[data-email]');
-        var password = screen.querySelector('[data-password]');
-        var error = screen.querySelector('[data-error]');
-
-        function fail(msg) { error.style.display = 'block'; error.textContent = msg; }
-
-        screen.querySelector('[data-back]').addEventListener('click', function () { errorText = ''; renderLogin(); });
-
-        screen.querySelector('[data-create]').addEventListener('click', function () {
-          var n = name.value.trim();
-          var e = email.value.trim().toLowerCase();
-          var p = password.value;
-          if (n.length < 2) { fail('Enter the name you want on the account.'); return; }
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) { fail('That address is missing an @ or a domain.'); return; }
-          if (p.length < 8) { fail('Use at least 8 characters. Longer is better than clever.'); return; }
-          if (db.users.some(function (u) { return u.email === e; })) { fail('An account already exists for that email.'); return; }
-          var salt = Ledger.salt();
-          Ledger.hash(p, salt).then(function (digest) {
-            db.users.push({ id: db.users.length + 1, name: n, email: e, salt: salt, hash: digest, created: Date.now() });
-            db.session = db.users[db.users.length - 1].id;
-            Ledger.save(db);
-            filter = 'ALL';
-            errorText = '';
-            renderTasks();
-          });
-        });
-      }
-
-      /* ---------------- ledger ---------------- */
-
-      function renderTasks() {
-        var user = me();
-        if (!user) { renderLogin(); return; }
-
-        var rows = tasksFor(user, filter);
-        var open = db.tasks.filter(function (t) { return t.user === user.id && !t.done; }).length;
-        var done = db.tasks.filter(function (t) { return t.user === user.id && t.done; }).length;
-
-        var emptyCopy = {
-          ALL: ['00 / no entries', 'The ledger is clean.', 'Add the first entry. It stays on this device.'],
-          OPEN: ['00 / no open entries', 'Nothing open.', 'Every entry on the page is struck through.'],
-          DONE: ['00 / no finished entries', 'Nothing finished yet.', 'Tap an entry to strike it through.']
-        }[filter];
-
-        screen.innerHTML =
-          '<div class="s-hdr" style="padding-bottom:0">' +
-            '<div class="s-masthead">' +
-              '<span class="legend">OIBSIP / Instrument 02</span>' +
-              '<button class="btn-quiet" data-logout style="padding:0">Log out</button>' +
-            '</div>' +
-            '<hr class="rule rule--ink">' +
-            '<h3 class="s-title">The Ledger</h3>' +
-            '<p class="s-standfirst">Tasks are keyed to your account and stored in SQLite on the device.</p>' +
-          '</div>' +
-          '<div class="count-block">' +
-            '<span class="count-number">' + (open > 99 ? open : pad2(open)) + '</span>' +
-            '<span class="count-side"><span class="legend">Open</span><span class="legend" style="font-size:8.5px">' + pad2(done) + ' done</span></span>' +
-            '<span class="count-name">' + user.name.replace(/[<>&]/g, '') + '</span>' +
-          '</div>' +
-          '<hr class="rule rule--ink" style="margin:8px 16px 0">' +
-          '<div class="tabs" style="padding:0 16px" data-filters>' +
-            ['ALL', 'OPEN', 'DONE'].map(function (f) {
-              return '<button class="tab" role="tab" aria-selected="' + (f === filter) + '" data-filter="' + f + '">' + f.toLowerCase() + '</button>';
+      shell(
+        '<div class="screen-views">' +
+          '<header class="app-head">' +
+            '<div style="flex:1"><div class="app-title">Your tasks</div>' +
+            '<div class="countline">' + c.open + ' open, ' + c.done + ' done</div></div>' +
+            '<button class="pill pill--ghost pill--small" type="button" data-logout>Log out</button>' +
+          '</header>' +
+          '<div class="row-of-chips" style="margin-top:12px">' +
+            ['All', 'Open', 'Done'].map(function (name) {
+              return '<button class="chip" type="button" data-filter="' + name + '" aria-pressed="' +
+                (db.filter === name) + '">' + name + '</button>';
             }).join('') +
           '</div>' +
-          '<div class="task-list" data-list></div>' +
-          '<div class="foot"><button class="cta" data-add>Add entry</button></div>';
+          (list.length ?
+            '<div class="task-list" data-list>' + list.map(taskRow).join('') + '</div>' :
+            '<div class="empty"><span class="tile">' + ICON.check + '</span>' +
+              '<div><strong>' + (db.filter === 'All' ? 'Nothing here yet' :
+                db.filter === 'Open' ? 'All clear' : 'Nothing finished') + '</strong>' +
+              '<p>' + (db.filter === 'All' ? 'Tap the plus button to write down the first thing.' :
+                db.filter === 'Open' ? 'Everything on the list is finished.' :
+                'Tasks show up here once you tick them off.') + '</p></div></div>') +
+          '<button class="fab" type="button" data-add aria-label="New task">' + ICON.plus + '</button>' +
+        '</div>'
+      );
 
-        var list = screen.querySelector('[data-list]');
+      Array.prototype.forEach.call(root.querySelectorAll('[data-filter]'), function (chip) {
+        chip.addEventListener('click', function () {
+          db.filter = chip.getAttribute('data-filter');
+          renderList();
+        });
+      });
 
-        if (!rows.length) {
-          list.appendChild(h(
-            '<div class="empty">' +
-              '<p class="legend">' + emptyCopy[0] + '</p>' +
-              '<p class="empty-title">' + emptyCopy[1] + '</p>' +
-              '<p class="error-line" style="color:var(--muted);padding:7px 0 0;letter-spacing:0">' + emptyCopy[2] + '</p>' +
-            '</div>'));
-        }
-
-        rows.forEach(function (task) {
-          var node = h(
-            '<div class="task' + (task.done ? ' task-done' : '') + '">' +
-              '<span class="task-open"></span>' +
-              '<span class="task-check"><svg width="11" height="9" viewBox="0 0 14 11"><path d="M1 5.4 L5 9.4 L13 1.2" fill="none" stroke="#f3f0e9" stroke-width="2"/></svg></span>' +
-              '<div class="task-body">' +
-                '<div class="task-title"></div>' +
-                (task.notes ? '<p class="task-notes"></p>' : '') +
-                '<p class="task-stamp">' + (task.done ? 'Done ' : 'Added ') + stamp(task.completed || task.created) + '</p>' +
-              '</div>' +
-              '<button class="task-del" aria-label="Delete entry">Del</button>' +
-            '</div>');
-          node.querySelector('.task-title').textContent = task.title;
-          if (task.notes) node.querySelector('.task-notes').textContent = task.notes;
-          node.querySelector('.task-body').addEventListener('click', function () {
-            task.done = !task.done;
-            task.completed = task.done ? Date.now() : null;
-            Ledger.save(db);
-            renderTasks();
+      Array.prototype.forEach.call(root.querySelectorAll('[data-toggle]'), function (tick) {
+        tick.addEventListener('click', function () {
+          var id = Number(tick.getAttribute('data-toggle'));
+          db.tasks.forEach(function (t) {
+            if (t.id === id) {
+              t.done = !t.done;
+              t.at = Date.now();
+            }
           });
-          node.querySelector('.task-del').addEventListener('click', function () { confirmDelete(task); });
-          list.appendChild(node);
+          renderList();
         });
+      });
 
-        screen.querySelector('[data-logout]').addEventListener('click', function () {
-          db.session = null;
-          Ledger.save(db);
-          filter = 'ALL';
-          errorText = '';
-          renderLogin();
+      Array.prototype.forEach.call(root.querySelectorAll('[data-delete]'), function (button) {
+        button.addEventListener('click', function () {
+          var id = Number(button.getAttribute('data-delete'));
+          confirmDelete(id);
         });
+      });
 
-        Array.prototype.forEach.call(screen.querySelectorAll('[data-filter]'), function (tab) {
-          tab.addEventListener('click', function () { filter = tab.getAttribute('data-filter'); renderTasks(); });
-        });
+      cash(root, '[data-add]').addEventListener('click', addSheet);
+      cash(root, '[data-logout]').addEventListener('click', function () {
+        db.session = null;
+        renderLogin('Signed out.');
+      });
+    }
 
-        screen.querySelector('[data-add]').addEventListener('click', addEntry);
-      }
+    function taskRow(task) {
+      return '<article class="task' + (task.done ? ' is-done' : '') + '">' +
+        '<button class="tick" type="button" data-toggle="' + task.id + '" aria-label="' +
+          (task.done ? 'Mark as open' : 'Mark as done') + '">' + ICON.check + '</button>' +
+        '<div class="task-body">' +
+          '<div class="task-title">' + escapeHtml(task.title) + '</div>' +
+          (task.note ? '<div class="task-note">' + escapeHtml(task.note) + '</div>' : '') +
+          '<div class="task-stamp">' + (task.done ? 'Done' : 'Added') + ' ' + stamp(task.at) + '</div>' +
+        '</div>' +
+        '<button class="iconbtn" type="button" data-delete="' + task.id + '" aria-label="Delete">' +
+          ICON.trash + '</button>' +
+      '</article>';
+    }
 
-      function addEntry() {
-        openSheet(screen,
-          '<p class="legend">OIBSIP / Ledger / New entry</p>' +
-          '<hr class="rule rule--ink">' +
-          '<h4>Add an entry</h4>' +
-          '<div style="margin-top:12px">' +
-            '<div class="row" style="padding:0"><span class="legend gutter">01 / Task</span><input class="field" data-title maxlength="120" placeholder="What needs doing?"></div>' +
-            '<div class="row" style="padding:0;align-items:flex-start"><span class="legend gutter" style="padding-top:12px">02 / Notes</span>' +
-              '<textarea class="field" data-notes rows="2" maxlength="400" placeholder="Context, a link, a deadline" style="resize:none;text-align:right;padding-top:11px"></textarea></div>' +
+    function escapeHtml(text) {
+      return String(text).replace(/[&<>"]/g, function (ch) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch];
+      });
+    }
+
+    function addSheet() {
+      var scrim = render(
+        '<div class="scrim"><div class="sheet" role="dialog" aria-label="New task">' +
+          '<h3>New task</h3>' +
+          '<div><p class="label">Task</p>' +
+            '<input class="field" data-title placeholder="What needs doing?" style="margin-top:5px" /></div>' +
+          '<div><p class="label">Note (optional)</p>' +
+            '<textarea class="field" data-note-input placeholder="Anything worth remembering" style="margin-top:5px"></textarea></div>' +
+          '<p class="errorline" data-sheet-error style="margin-top:0"></p>' +
+          '<div class="sheet-actions">' +
+            '<button class="pill pill--ghost" type="button" data-cancel>Cancel</button>' +
+            '<button class="pill pill--primary" type="button" data-save>Add</button>' +
           '</div>' +
-          '<div class="sheet-actions"><button class="btn-ghost" data-cancel>Cancel</button><button class="cta" data-save>Add</button></div>' +
-          '<p class="sheet-note">Notes are optional. Titles are capped at 120 characters so the row can never break its rhythm.</p>',
-          function (sheet, close) {
-            var title = sheet.querySelector('[data-title]');
-            title.focus();
-            sheet.querySelector('[data-cancel]').addEventListener('click', close);
-            sheet.querySelector('[data-save]').addEventListener('click', function () {
-              var value = title.value.replace(/\s+/g, ' ').trim();
-              if (!value) { title.focus(); toast(screen, 'An entry needs a title.'); return; }
-              db.tasks.push({
-                id: db.nextTask++, user: me().id, title: value,
-                notes: sheet.querySelector('[data-notes]').value.trim(),
-                done: false, created: Date.now(), completed: null
-              });
-              Ledger.save(db);
-              if (filter === 'DONE') filter = 'ALL';
-              close();
-              renderTasks();
-            });
-          });
+        '</div></div>'
+      );
+      root.appendChild(scrim);
+      var title = cash(scrim, '[data-title]');
+      var note = cash(scrim, '[data-note-input]');
+      var error = cash(scrim, '[data-sheet-error]');
+      title.focus();
+
+      function close() {
+        scrim.remove();
       }
 
-      function confirmDelete(task) {
-        openSheet(screen,
-          '<p class="legend">OIBSIP / Ledger / Delete</p>' +
-          '<hr class="rule rule--ink">' +
-          '<h4>Delete this entry?</h4>' +
-          '<p class="task-title" style="margin:10px 0 0;font-size:12px"></p>' +
-          '<p class="sheet-note">This is permanent. There is no archive, and no undo.</p>' +
-          '<div class="sheet-actions"><button class="btn-ghost" data-cancel>Cancel</button><button class="cta" data-delete>Delete</button></div>',
-          function (sheet, close) {
-            sheet.querySelector('.task-title').textContent = task.title;
-            sheet.querySelector('[data-cancel]').addEventListener('click', close);
-            sheet.querySelector('[data-delete]').addEventListener('click', function () {
-              db.tasks = db.tasks.filter(function (t) { return t.id !== task.id; });
-              Ledger.save(db);
-              if (filter === 'DONE') filter = 'ALL';
-              close();
-              renderTasks();
-            });
-          });
-      }
-
-      if (db.session) renderTasks(); else renderLogin();
-    }
-  };
-
-  /* =============================================================================
-     03 · CALCULATOR  (same token model as Evaluator.java)
-     ========================================================================== */
-
-  var CALCULATOR = {
-    id: 'calculator',
-    number: '03',
-    name: 'Calculator',
-    spec: 'Task 3 · Java + XML · GridLayout',
-    edges: [
-      'Precedence: 2 + 3 × 4 = 14',
-      'Divide by zero → ERROR, no crash',
-      'Tape capped at 24 tokens',
-      'Backspace walks back through a number',
-      'Result chained into the next sum'
-    ],
-    mount: function (screen) {
-      var keys = [
-        ['AC', 'fn'], ['±', 'fn'], ['%', 'fn'], ['÷', 'op'],
-        ['7', ''], ['8', ''], ['9', ''], ['×', 'op'],
-        ['4', ''], ['5', ''], ['6', ''], ['−', 'op'],
-        ['1', ''], ['2', ''], ['3', ''], ['+', 'op'],
-        ['0', ''], ['.', ''], ['Del', 'fn'], ['=', 'eq']
-      ];
-
-      screen.innerHTML =
-        '<div class="s-hdr">' +
-          '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 03</span><span class="legend">Rev 1.0</span></div>' +
-          '<hr class="rule rule--ink">' +
-          '<h3 class="s-title" style="font-size:22px">Calculator</h3>' +
-          '<p class="s-standfirst" style="font-size:9px">Four functions, twenty keys. No history, nothing saved when you leave.</p>' +
-        '</div>' +
-        '<div class="readout calc-display">' +
-          '<div class="calc-tape"><span class="legend">03 / Display</span><span class="legend" data-tape>New tape</span></div>' +
-          '<p class="readout-value" data-result>0</p>' +
-        '</div>' +
-        '<div class="calc-keys" data-keys></div>';
-
-      var tapeView = screen.querySelector('[data-tape]');
-      var result = screen.querySelector('[data-result]');
-      var keyPad = screen.querySelector('[data-keys]');
-
-      var tokens = [];
-      var operand = '';
-      var resultRaw = null;
-      var lastExpression = '';
-      var evaluated = false;
-      var error = false;
-      var reason = '';
-
-      var OPS = ['+', '−', '×', '÷'];
-      var MAX_TOKENS = 24, MAX_OPERAND = 14;
-
-      function isOp(t) { return OPS.indexOf(t) >= 0; }
-
-      function evaluate(list) {
-        if (!list.length) return 0;
-        if (list.length % 2 === 0) throw new Error('Incomplete');
-        var nums = [], ops = [];
-        list.forEach(function (t, i) {
-          if (i % 2 === 0) {
-            var n = parseFloat(String(t).replace(/,/g, '').replace('−', '-'));
-            if (isNaN(n)) throw new Error('Not a number');
-            nums.push(n);
-          } else {
-            if (!isOp(t)) throw new Error('Expected an operator');
-            ops.push(t);
-          }
+      cash(scrim, '[data-cancel]').addEventListener('click', close);
+      scrim.addEventListener('click', function (event) {
+        if (event.target === scrim) { close(); }
+      });
+      cash(scrim, '[data-save]').addEventListener('click', function () {
+        if (!title.value.trim()) {
+          error.textContent = 'Give the task a name.';
+          return;
+        }
+        db.tasks.push({
+          id: db.nextTaskId++,
+          owner: db.session,
+          title: title.value.trim(),
+          note: note.value.trim(),
+          done: false,
+          at: Date.now()
         });
-        var folded = [nums[0]], adds = [];
-        for (var i = 0; i < ops.length; i++) {
-          var op = ops[i], next = nums[i + 1], last = folded.length - 1;
-          if (op === '×') folded[last] = folded[last] * next;
-          else if (op === '÷') {
-            if (next === 0) throw new Error('DIVIDE BY ZERO');
-            folded[last] = folded[last] / next;
-          } else { adds.push(op); folded.push(next); }
-        }
-        var total = folded[0];
-        adds.forEach(function (op, i) { total = op === '+' ? total + folded[i + 1] : total - folded[i + 1]; });
-        if (!isFinite(total) || isNaN(total)) throw new Error('OUT OF RANGE');
-        return total;
-      }
-
-      function calcFmt(v) {
-        var abs = Math.abs(v);
-        if (abs < 5e-12) return '0';
-        if (abs >= 1e12 || abs < 1e-9) return v.toExponential(6).toUpperCase();
-        var fixed = v.toFixed(10).replace(/0+$/, '').replace(/\.$/, '');
-        return groupInt(fixed);
-      }
-
-      function clearError() {
-        if (error) { error = false; reason = ''; tokens = []; operand = ''; }
-      }
-
-      function render() {
-        var big;
-        if (error) big = 'ERROR';
-        else if (operand) big = groupInt(operand);
-        else if (evaluated && resultRaw) big = groupInt(resultRaw);
-        else if (tokens.length && !isOp(tokens[tokens.length - 1])) big = groupInt(tokens[tokens.length - 1]);
-        else big = resultRaw ? groupInt(resultRaw) : '0';
-        result.textContent = big;
-        fitReadout(result, big, 34, 15);
-
-        var tape;
-        if (error) tape = reason;
-        else if (evaluated) tape = lastExpression;
-        else if (tokens.length) tape = tokens.join(' ');
-        else tape = 'New tape';
-        tapeView.textContent = tape.toUpperCase();
-      }
-
-      function pressKey(key) {
-        if (/^\d$/.test(key)) {
-          clearError();
-          if (evaluated) { tokens = []; operand = ''; resultRaw = null; lastExpression = ''; evaluated = false; }
-          if (operand.length >= MAX_OPERAND) return;
-          if (operand === '0') operand = key;
-          else if (operand === '-0') operand = '-' + key;
-          else operand += key;
-        } else if (key === '.') {
-          clearError();
-          if (evaluated) { tokens = []; operand = ''; resultRaw = null; evaluated = false; }
-          if (operand.indexOf('.') >= 0 || operand.length >= MAX_OPERAND) return;
-          operand = operand ? operand + '.' : '0.';
-        } else if (OPS.indexOf(key) >= 0) {
-          if (error) return;
-          if (evaluated) {
-            tokens = []; if (resultRaw !== null) tokens.push(resultRaw);
-            operand = ''; lastExpression = ''; evaluated = false;
-          }
-          if (operand) { tokens.push(operand); operand = ''; }
-          if (!tokens.length) tokens.push('0');
-          if (tokens.length >= MAX_TOKENS) return;
-          var last = tokens[tokens.length - 1];
-          if (isOp(last)) tokens[tokens.length - 1] = key;
-          else tokens.push(key);
-        } else if (key === '=') {
-          if (error) return;
-          if (operand) { tokens.push(operand); operand = ''; }
-          while (tokens.length && isOp(tokens[tokens.length - 1])) tokens.pop();
-          if (!tokens.length) { render(); return; }
-          lastExpression = tokens.join(' ');
-          try {
-            var value = evaluate(tokens);
-            var text = calcFmt(value);
-            resultRaw = text.replace(/,/g, '');
-            evaluated = true;
-            tokens = [];
-            render();
-            result.style.opacity = '0.3';
-            requestAnimationFrame(function () { result.style.opacity = '1'; });
-            return;
-          } catch (e) {
-            error = true;
-            reason = e.message === 'DIVIDE BY ZERO' ? 'Division by zero · the tape stops here' : 'Out of range · clear to start again';
-            tokens = []; operand = ''; resultRaw = null; evaluated = false;
-          }
-        } else if (key === 'AC') {
-          tokens = []; operand = ''; resultRaw = null; lastExpression = ''; evaluated = false; error = false; reason = '';
-        } else if (key === 'Del') {
-          if (error) { tokens = []; operand = ''; error = false; reason = ''; }
-          else if (evaluated) { tokens = []; operand = ''; resultRaw = null; lastExpression = ''; evaluated = false; }
-          else if (operand) {
-            operand = operand.slice(0, -1);
-            if (operand === '-') operand = '';
-          } else if (tokens.length) {
-            var removed = tokens.pop();
-            if (!isOp(removed)) operand = removed.length > 1 ? removed.slice(0, -1) : '';
-          }
-        } else if (key === '±') {
-          clearError();
-          if (evaluated) {
-            if (resultRaw === null) return;
-            resultRaw = resultRaw.startsWith('-') ? resultRaw.slice(1) : '-' + resultRaw;
-          } else {
-            if (!operand) return;
-            operand = operand.startsWith('-') ? operand.slice(1) : '-' + operand;
-          }
-        } else if (key === '%') {
-          clearError();
-          var source = operand || (evaluated ? resultRaw : null);
-          if (source === null || source === '') return;
-          operand = String(parseFloat(source) / 100).replace(/\.?0+$/, '');
-          if (operand === '' || operand === '-') operand = '0';
-          evaluated = false;
-        }
-        render();
-      }
-
-      keys.forEach(function (k) {
-        var cls = 'key' + (k[1] ? ' key--' + k[1] : '');
-        var btn = h('<button class="' + cls + '">' + k[0] + '</button>');
-        btn.addEventListener('click', function () { pressKey(k[0]); });
-        keyPad.appendChild(btn);
+        db.filter = 'All';
+        close();
+        renderList();
       });
-
-      /* typing on a physical keyboard, because a demo is usually on a laptop */
-      screen.setAttribute('tabindex', '0');
-      screen.addEventListener('keydown', function (e) {
-        var map = { '*': '×', '/': '÷', 'x': '×', '-': '−', '+': '+', 'Enter': '=', '=': '=', 'Backspace': 'Del', 'Escape': 'AC', 'c': 'AC', '.': '.', ',': '.' };
-        if (/^\d$/.test(e.key)) { pressKey(e.key); e.preventDefault(); }
-        else if (map[e.key]) { pressKey(map[e.key]); e.preventDefault(); }
-      });
-
-      render();
     }
-  };
 
-  /* =============================================================================
-     04 · PASSAGE (quiz)
-     ========================================================================== */
+    function confirmDelete(id) {
+      var task = db.tasks.filter(function (t) { return t.id === id; })[0];
+      if (!task) {
+        return;
+      }
+      var scrim = render(
+        '<div class="scrim"><div class="sheet" role="dialog" aria-label="Delete task">' +
+          '<h3>Delete this task?</h3>' +
+          '<p>' + escapeHtml(task.title) + '</p>' +
+          '<div class="sheet-actions">' +
+            '<button class="pill pill--ghost" type="button" data-cancel>Cancel</button>' +
+            '<button class="pill pill--primary" type="button" data-confirm>Delete</button>' +
+          '</div>' +
+        '</div></div>'
+      );
+      root.appendChild(scrim);
+      cash(scrim, '[data-cancel]').addEventListener('click', function () {
+        scrim.remove();
+      });
+      cash(scrim, '[data-confirm]').addEventListener('click', function () {
+        db.tasks = db.tasks.filter(function (t) { return t.id !== id; });
+        scrim.remove();
+        renderList();
+      });
+    }
 
-  var BANK = [
-    ['One minute of latitude spans how far across the Earth\u2019s surface?',
-      ['One nautical mile', 'One kilometre', 'One statute mile', 'One degree of longitude'], 0,
-      'By definition one minute of latitude is one nautical mile, 1,852 m. That is why distance on a paper chart is measured against the latitude scale at the side, never the longitude scale at the top.'],
-    ['The international nautical mile is defined as exactly',
-      ['1,609.344 metres', '1,829 metres', '1,852 metres', '1,000 metres'], 2,
-      'Fixed at 1,852 m by the 1929 International Hydrographic Conference. The old British Admiralty mile was 1,853.184 m, which is why very old charts disagree with a GPS fix.'],
-    ['A knot is',
-      ['One statute mile per hour', 'One hundred fathoms per hour', 'One metre per second', 'One nautical mile per hour'], 3,
-      'Ten knots is ten nautical miles an hour, about 18.5 km/h. Speed logs and GPS both report knots, and charts are scaled in nautical miles.'],
-    ['Which instrument measures the angle between the horizon and a celestial body?',
-      ['Chronometer', 'Sextant', 'Barograph', 'Lead line'], 1,
-      'A sextant reads that angle to a tenth of a minute of arc. The chronometer supplies the time and the time supplies longitude; the sextant alone only gives latitude.'],
-    ['A chronometer set to GMT is used to find',
-      ['Latitude', 'Depth', 'Longitude', 'Magnetic variation'], 2,
-      'Longitude is a time problem. The Earth turns 15 degrees every hour, so one hour of chronometer error becomes 15 degrees of longitude — up to 900 nautical miles at the equator.'],
-    ['Which star sits within one degree of the north celestial pole?',
-      ['Sirius', 'Vega', 'Canopus', 'Polaris'], 3,
-      'Polaris is about 0.65 degrees from the pole today, so its altitude is a usable latitude in the northern hemisphere. The southern hemisphere has no equivalent bright pole star.'],
-    ['Under IALA Region A, the mark on the port side of a channel entering from seaward is',
-      ['Green', 'Red', 'Yellow', 'White'], 1,
-      'Region B — the Americas, Japan, Korea and the Philippines — reverses red and green. Mixing the two conventions is a classic cause of grounding.'],
-    ['A light charted as Fl(3) 20s shows',
-      ['A fixed light for 20 seconds', 'Three occultations per minute', 'Three flashes every 20 seconds', 'Three separate lights'], 2,
-      'The bracket is the group count; the number after it is the period of one full cycle. Fl(3) 20s is three flashes, then darkness, repeating every twenty seconds.'],
-    ['A sounding of 12 on a metric chart means',
-      ['12 fathoms below the keel', '12 metres of clearance under the keel', '12 metres at mean high water', '12 metres of water below chart datum'], 3,
-      'Soundings are depths below chart datum, not below your keel. Subtract your draft, then add the height of tide, before deciding the water is safe.'],
-    ['Mercator\u2019s projection keeps compass bearings straight but distorts',
-      ['The compass rose', 'Scale, increasingly with latitude', 'Depth', 'Magnetic variation'], 1,
-      'That is why Greenland looks the size of Africa. The trade is deliberate: a straight line on a Mercator chart is a constant bearing on the water.'],
-    ['Dead reckoning is a position found from',
-      ['Course, speed and time since the last fix', 'The last satellite fix', 'A line of soundings', 'The height of the tide'], 0,
-      'It accumulates error with every course change and every current you did not allow for, so it is corrected by a fix as soon as one is available.'],
-    ['Facing forward on a vessel, port and starboard are',
-      ['Port right, starboard left', 'Port aft, starboard forward', 'Port forward, starboard aft', 'Port left, starboard right'], 3,
-      'Port is left, starboard is right, and both are fixed to the vessel rather than to the person on deck — the reason an order is repeated back before it is carried out.']
+    seedDemo();
+    renderLogin();
+    db.previewSignIn = function () { return signIn('demo@example.com', 'oibsip1234'); };
+  }
+
+  /* ================================================================ calculator */
+
+  function mountCalculator(root) {
+    var MAX_TOKENS = 24;
+    var MAX_OPERAND = 14;
+    var OPS = { '+': '+', '−': '−', '×': '×', '÷': '÷' };
+
+    var tokens = [];
+    var operand = '';
+    var resultRaw = null;
+    var lastExpression = '';
+    var evaluated = false;
+    var errorReason = '';
+
+    root.innerHTML =
+      '<header class="app-head">' +
+        '<span class="tile">' + ICON.calculator + '</span>' +
+        '<div style="flex:1"><div class="app-title" style="font-size:19px">Calculator</div></div>' +
+        '<p class="label">Tap a number</p>' +
+      '</header>' +
+      '<div class="card calc-card">' +
+        '<div class="calc-tape" data-tape>Ready</div>' +
+        '<div class="calc-readout" data-readout>0</div>' +
+      '</div>' +
+      '<div class="keypad">' +
+        '<div class="key-row">' +
+          '<button class="key key--action" data-key="C" type="button">C</button>' +
+          '<button class="key key--action" data-key="del" type="button" aria-label="Delete last digit">' + ICON.backspace + '</button>' +
+          '<button class="key key--action" data-key="%" type="button">%</button>' +
+          '<button class="key key--op" data-key="÷" type="button">÷</button>' +
+        '</div>' +
+        keyRow(['7', '8', '9', '×']) +
+        keyRow(['4', '5', '6', '−']) +
+        keyRow(['1', '2', '3', '+']) +
+        '<div class="key-row">' +
+          '<button class="key key--action" data-key="sign" type="button">±</button>' +
+          '<button class="key" data-key="0" type="button">0</button>' +
+          '<button class="key" data-key="." type="button">.</button>' +
+          '<button class="key key--equals" data-key="=" type="button">=</button>' +
+        '</div>' +
+      '</div>';
+
+    function keyRow(keys) {
+      return '<div class="key-row">' + keys.map(function (key) {
+        var op = OPS[key];
+        return '<button class="key' + (op ? ' key--op' : '') + '" data-key="' + key + '" type="button">' + key + '</button>';
+      }).join('') + '</div>';
+    }
+
+    var readout = cash(root, '[data-readout]');
+    var tape = cash(root, '[data-tape]');
+
+    function pushDigit(digit) {
+      clearError();
+      if (evaluated) { reset(); }
+      if (operand.length >= MAX_OPERAND) { return; }
+      if (operand === '0') { operand = digit; }
+      else if (operand === '-0') { operand = '-' + digit; }
+      else { operand += digit; }
+      paint();
+    }
+
+    function pushDot() {
+      clearError();
+      if (evaluated) { reset(); }
+      if (operand.indexOf('.') > -1 || operand.length >= MAX_OPERAND) { return; }
+      operand = operand ? operand + '.' : '0.';
+      paint();
+    }
+
+    function pushOperator(op) {
+      if (errorReason) { return; }
+      if (evaluated) {
+        tokens = resultRaw ? [resultRaw] : [];
+        operand = '';
+        lastExpression = '';
+        evaluated = false;
+      }
+      if (operand) {
+        tokens.push(operand);
+        operand = '';
+      }
+      if (!tokens.length) { tokens.push('0'); }
+      if (tokens.length >= MAX_TOKENS) { return; }
+      var last = tokens[tokens.length - 1];
+      if (OPS[last]) { tokens[tokens.length - 1] = op; }
+      else { tokens.push(op); }
+      paint();
+    }
+
+    function pushEquals() {
+      if (errorReason) { return; }
+      if (operand) {
+        tokens.push(operand);
+        operand = '';
+      }
+      while (tokens.length && OPS[tokens[tokens.length - 1]]) {
+        tokens.pop();
+      }
+      if (!tokens.length) { paint(); return; }
+      var expression = tokens.join(' ');
+      try {
+        var value = evaluate(tokens);
+        resultRaw = tidy(value).replace(/,/g, '');
+        lastExpression = expression + ' =';
+        tokens = [];
+        evaluated = true;
+        paint();
+        toast(readout);
+      } catch (err) {
+        enterError(err.message);
+      }
+    }
+
+    function evaluate(list) {
+      if (list.length % 2 === 0) { throw new Error('Number is out of range'); }
+      var numbers = [];
+      var operators = [];
+      list.forEach(function (token, i) {
+        if (i % 2 === 0) {
+          var n = parseFloat(token.replace(/,/g, '').replace('−', '-'));
+          if (isNaN(n)) { throw new Error('Number is out of range'); }
+          numbers.push(n);
+        } else {
+          operators.push(token);
+        }
+      });
+
+      var folded = [numbers[0]];
+      var additions = [];
+      operators.forEach(function (op, i) {
+        var next = numbers[i + 1];
+        var last = folded.length - 1;
+        if (op === '×') {
+          folded[last] = folded[last] * next;
+        } else if (op === '÷') {
+          if (next === 0) { throw new Error('Cannot divide by zero'); }
+          folded[last] = folded[last] / next;
+        } else {
+          additions.push(op);
+          folded.push(next);
+        }
+      });
+
+      var total = folded[0];
+      additions.forEach(function (op, i) {
+        total = op === '+' ? total + folded[i + 1] : total - folded[i + 1];
+      });
+      if (!isFinite(total)) { throw new Error('Number is out of range'); }
+      return total;
+    }
+
+    function clearError() {
+      if (errorReason) {
+        errorReason = '';
+        reset();
+      }
+    }
+
+    function reset() {
+      tokens = [];
+      operand = '';
+      resultRaw = null;
+      lastExpression = '';
+      evaluated = false;
+    }
+
+    function enterError(reason) {
+      errorReason = reason;
+      reset();
+      paint();
+      toast(readout);
+    }
+
+    function paint() {
+      var big;
+      if (errorReason) {
+        big = 'Error';
+      } else if (operand) {
+        big = groupThousands(operand);
+      } else if (evaluated && resultRaw !== null) {
+        big = groupThousands(resultRaw);
+      } else if (tokens.length && !OPS[tokens[tokens.length - 1]]) {
+        big = groupThousands(tokens[tokens.length - 1]);
+      } else {
+        big = resultRaw ? groupThousands(resultRaw) : '0';
+      }
+
+      var line;
+      if (errorReason) { line = errorReason; }
+      else if (evaluated) { line = lastExpression; }
+      else if (tokens.length) { line = tokens.join(' '); }
+      else { line = 'Ready'; }
+
+      readout.textContent = big;
+      tape.textContent = line;
+    }
+
+    Array.prototype.forEach.call(root.querySelectorAll('[data-key]'), function (button) {
+      button.addEventListener('click', function () {
+        var key = button.getAttribute('data-key');
+        if (/^[0-9]$/.test(key)) { pushDigit(key); }
+        else if (key === '.') { pushDot(); }
+        else if (key === '=') { pushEquals(); }
+        else if (key === 'C') { reset(); clearError(); paint(); }
+        else if (key === 'del') { backspace(); }
+        else if (key === 'sign') { flipSign(); }
+        else if (key === '%') { percent(); }
+        else { pushOperator(key); }
+      });
+    });
+
+    function backspace() {
+      if (errorReason || evaluated) {
+        reset();
+        errorReason = '';
+        paint();
+        return;
+      }
+      if (operand) {
+        operand = operand.slice(0, -1);
+        if (operand === '-') { operand = ''; }
+      } else if (tokens.length) {
+        var removed = tokens.pop();
+        if (!OPS[removed]) {
+          operand = removed.length > 1 ? removed.slice(0, -1) : '';
+        }
+      }
+      paint();
+    }
+
+    function flipSign() {
+      clearError();
+      if (evaluated) {
+        if (resultRaw === null) { return; }
+        resultRaw = resultRaw.charAt(0) === '-' ? resultRaw.slice(1) : '-' + resultRaw;
+        paint();
+        return;
+      }
+      if (!operand) { return; }
+      operand = operand.charAt(0) === '-' ? operand.slice(1) : '-' + operand;
+      paint();
+    }
+
+    function percent() {
+      clearError();
+      var source = operand || (evaluated ? resultRaw : null);
+      if (!source) { return; }
+      var value = parseFloat(source);
+      if (isNaN(value)) { return; }
+      operand = String(value / 100);
+      evaluated = false;
+      paint();
+    }
+
+    paint();
+  }
+
+  /* ====================================================================== quiz */
+
+  var QUESTIONS = [
+    {
+      prompt: 'Which planet has the shortest day?',
+      options: ['Jupiter', 'Mercury', 'Mars', 'Venus'],
+      correct: 0,
+      note: 'Jupiter turns once in just under ten hours, the fastest of the eight planets.'
+    },
+    {
+      prompt: 'What is the capital of Portugal?',
+      options: ['Porto', 'Lisbon', 'Coimbra', 'Braga'],
+      correct: 1,
+      note: 'Lisbon has been the capital since the thirteenth century.'
+    },
+    {
+      prompt: 'Which gas makes up most of the air we breathe?',
+      options: ['Oxygen', 'Carbon dioxide', 'Nitrogen', 'Argon'],
+      correct: 2,
+      note: 'Nitrogen is about 78 percent of the atmosphere. Oxygen is roughly 21.'
+    },
+    {
+      prompt: 'Who wrote the play "A Midsummer Night\'s Dream"?',
+      options: ['Christopher Marlowe', 'William Shakespeare', 'Ben Jonson', 'John Webster'],
+      correct: 1,
+      note: 'Shakespeare wrote it around 1595 and it was printed in 1600.'
+    },
+    {
+      prompt: 'How many strings does a standard violin have?',
+      options: ['Four', 'Five', 'Six', 'Seven'],
+      correct: 0,
+      note: 'G, D, A and E, tuned in fifths.'
+    },
+    {
+      prompt: 'What does the chemical symbol Fe stand for?',
+      options: ['Fluorine', 'Iron', 'Lead', 'Francium'],
+      correct: 1,
+      note: 'Fe comes from ferrum, the Latin word for iron.'
+    },
+    {
+      prompt: 'Which ocean is the largest by area?',
+      options: ['Atlantic', 'Indian', 'Pacific', 'Arctic'],
+      correct: 2,
+      note: 'The Pacific covers about a third of the planet on its own.'
+    },
+    {
+      prompt: 'In which year did the first iPhone go on sale?',
+      options: ['2005', '2006', '2007', '2008'],
+      correct: 2,
+      note: 'It went on sale in June 2007, after being announced in January.'
+    },
+    {
+      prompt: 'What is the longest river in Africa?',
+      options: ['Congo', 'Niger', 'Zambezi', 'Nile'],
+      correct: 3,
+      note: 'The Nile runs about 6,650 kilometres from source to sea.'
+    },
+    {
+      prompt: 'Which shape has eight sides?',
+      options: ['Hexagon', 'Heptagon', 'Octagon', 'Nonagon'],
+      correct: 2,
+      note: 'Octo is eight in Latin. A hexagon has six sides.'
+    },
+    {
+      prompt: 'Who painted "The Starry Night"?',
+      options: ['Claude Monet', 'Vincent van Gogh', 'Paul Cezanne', 'Edvard Munch'],
+      correct: 1,
+      note: 'Van Gogh painted it in 1889 while staying at Saint-Remy.'
+    },
+    {
+      prompt: 'How many bits are in one byte?',
+      options: ['4', '8', '16', '32'],
+      correct: 1,
+      note: 'A byte is eight bits, which gives 256 possible values.'
+    }
   ];
 
-  function mulberry32(seed) {
-    var a = seed >>> 0;
-    return function () {
-      a = (a + 0x6D2B79F5) >>> 0;
-      var t = a;
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
+  function mountQuiz(root) {
+    var deck = [];
+    var index = 0;
+    var answers = [];
+    var view = 'welcome';
 
-  function shuffle(list, rand) {
-    var copy = list.slice();
-    for (var i = copy.length - 1; i > 0; i--) {
-      var j = Math.floor(rand() * (i + 1));
-      var t = copy[i]; copy[i] = copy[j]; copy[j] = t;
+    root.innerHTML = '<div class="quiz-body" data-stage></div>';
+
+    function deal() {
+      var pool = QUESTIONS.slice();
+      for (var i = pool.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var held = pool[i];
+        pool[i] = pool[j];
+        pool[j] = held;
+      }
+      deck = pool.slice(0, 10).map(function (question) {
+        var order = question.options.map(function (text, i) { return { text: text, i: i }; });
+        for (var k = order.length - 1; k > 0; k--) {
+          var m = Math.floor(Math.random() * (k + 1));
+          var swap = order[k];
+          order[k] = order[m];
+          order[m] = swap;
+        }
+        return {
+          prompt: question.prompt,
+          options: order.map(function (o) { return o.text; }),
+          correct: order.map(function (o) { return o.i; }).indexOf(question.correct),
+          note: question.note
+        };
+      });
+      index = 0;
+      answers = [];
     }
-    return copy;
-  }
 
-  function deal(seed) {
-    var rand = mulberry32(seed);
-    return shuffle(BANK, rand).map(function (row) {
-      var correctText = row[1][row[2]];
-      var options = shuffle(row[1], rand);
-      return { prompt: row[0], options: options, correct: options.indexOf(correctText), note: row[3] };
-    });
-  }
-
-  var QUIZ = {
-    id: 'quiz',
-    number: '04',
-    name: 'Passage',
-    spec: 'Task 4 · Java + XML · 12 questions',
-    edges: [
-      'Seeded shuffle survives a rotation',
-      'Answer locks on the first tap',
-      'Notes explain every answer',
-      'Long options wrap, never clip',
-      'Restart deals a new seed'
-    ],
-    mount: function (screen) {
-      var deck = [];
-      var index = 0;
-      var answers = [];
-      var seed = 0;
-
-      function renderWelcome() {
-        screen.innerHTML =
-          '<div class="s-hdr">' +
-            '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 04</span><span class="legend">Rev 1.0</span></div>' +
-            '<hr class="rule rule--ink">' +
-            '<h3 class="s-title" style="font-size:34px;margin-top:22px">Passage</h3>' +
-            '<p class="s-standfirst" style="font-size:11px">Twelve questions on latitude, lights and the long way home. Every answer carries a note, whether you get it right or not.</p>' +
+    function renderWelcome() {
+      view = 'welcome';
+      root.innerHTML =
+        '<div class="screen-views" style="justify-content:center">' +
+          '<span class="tile" style="width:58px;height:58px">' + ICON.quiz + '</span>' +
+          '<h1 class="auth-title">Ten questions</h1>' +
+          '<p class="auth-sub" style="max-width:30ch">General knowledge, one card at a time. ' +
+            'You see the answer the moment you pick.</p>' +
+          '<div class="card" style="margin-top:16px;display:grid;gap:12px">' +
+            ['10 questions', '4 choices each', 'Feedback straight away'].map(function (line) {
+              return '<div style="display:flex;align-items:center;gap:10px;font-size:13px">' +
+                '<span style="color:var(--accent-ink);display:grid;place-items:center;width:18px">' +
+                '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" ' +
+                'stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 12.4l4.6 4.6L19.2 7.2"/></svg>' +
+                '</span>' + line + '</div>';
+            }).join('') +
           '</div>' +
-          '<div class="scroll">' +
-            '<div style="padding:0 16px;margin-top:20px">' +
-              '<hr class="rule rule--ink" style="margin:0">' +
-              specRow('01 / Questions', '12') +
-              specRow('02 / Order', 'Shuffled each run') +
-              specRow('03 / Scoring', 'One point, first answer') +
-              specRow('04 / Topic', 'Coastal navigation') +
-              '<hr class="rule rule--ink" style="margin:0">' +
-            '</div>' +
-          '</div>' +
-          '<div class="foot foot-stack">' +
-            '<button class="cta" data-start>Start the quiz</button>' +
-            '<p class="colophon-line">No score is saved · the card is wiped after each run</p>' +
-          '</div>';
-
-        screen.querySelector('[data-start]').addEventListener('click', function () {
-          seed = Math.floor(Math.random() * 1e9);
-          deck = deal(seed);
-          index = 0;
-          answers = deck.map(function () { return -1; });
-          renderQuestion();
-        });
-      }
-
-      function specRow(label, value) {
-        return '<div class="row" style="padding:0"><span class="legend gutter">' + label + '</span>' +
-          '<span class="field" style="text-align:right;font-size:11.5px">' + value + '</span></div>';
-      }
-
-      function renderQuestion() {
-        var card = deck[index];
-        var answered = answers[index] >= 0;
-        var done = index + (answered ? 1 : 0);
-
-        screen.innerHTML =
-          '<div class="s-hdr">' +
-            '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 04</span>' +
-              '<span class="legend" data-counter>Question ' + pad2(index + 1) + ' / ' + pad2(deck.length) + '</span></div>' +
-            '<div class="progress"><i style="width:' + (done / deck.length * 100) + '%"></i><i></i></div>' +
-            '<h3 class="question" data-question></h3>' +
-            '<p class="legend" data-hint style="margin:12px 0 0">Tap an answer. It locks immediately.</p>' +
-          '</div>' +
-          '<div class="scroll"><div class="options" data-options></div><p class="option-note" data-note style="display:none"></p></div>' +
-          '<div class="foot"><button class="cta" data-next disabled>' +
-            (index === deck.length - 1 ? 'See results' : 'Next question') + '</button></div>';
-
-        screen.querySelector('[data-question]').textContent = card.prompt;
-        var optionsBox = screen.querySelector('[data-options]');
-        var nextBtn = screen.querySelector('[data-next]');
-
-        card.options.forEach(function (text, i) {
-          var btn = h('<button class="option"><span class="idx">' + String.fromCharCode(65 + i) + '</span><span data-text></span></button>');
-          btn.querySelector('[data-text]').textContent = text;
-          btn.addEventListener('click', function () { answer(i); });
-          optionsBox.appendChild(btn);
-        });
-
-        if (answered) paint(card, answers[index]);
-
-        nextBtn.disabled = !answered;
-        nextBtn.addEventListener('click', advance);
-
-        function answer(choice) {
-          if (answers[index] >= 0) return;
-          answers[index] = choice;
-          paint(card, choice);
-          nextBtn.disabled = false;
-        }
-
-        function paint(current, choice) {
-          Array.prototype.forEach.call(optionsBox.children, function (btn, i) {
-            btn.disabled = true;
-            btn.classList.remove('option--correct', 'option--wrong', 'option--muted');
-            if (i === current.correct) btn.classList.add('option--correct');
-            else if (i === choice) btn.classList.add('option--wrong');
-            else btn.classList.add('option--muted');
-            btn.style.opacity = '0.55';
-            requestAnimationFrame(function () { btn.style.opacity = '1'; });
-          });
-          screen.querySelector('[data-hint]').style.display = 'none';
-          var note = screen.querySelector('[data-note]');
-          note.style.display = 'block';
-          note.textContent = 'NOTE · ' + current.note;
-          screen.querySelector('[data-counter]').textContent = 'Question ' + pad2(index + 1) + ' / ' + pad2(deck.length);
-          var bar = screen.querySelector('.progress i');
-          bar.style.width = ((index + 1) / deck.length * 100) + '%';
-        }
-      }
-
-      function advance() {
-        if (answers[index] < 0) return;
-        if (index < deck.length - 1) { index++; renderQuestion(); return; }
-        var correct = answers.filter(function (a, i) { return a >= 0 && a === deck[i].correct; }).length;
-        renderResult(correct, deck.length);
-      }
-
-      function verdictFor(correct, total) {
-        if (correct === total) return 'A clean landfall. Nothing to correct.';
-        var f = correct / total;
-        if (f >= 0.8) return 'Within a cable\u2019s length of perfect.';
-        if (f >= 0.55) return 'A workable fix. Read the notes, then run it again.';
-        if (f >= 0.3) return 'Off the chart. The notes matter more than the score.';
-        return 'Hard aground. Start with the definitions, then come back.';
-      }
-
-      function renderResult(correct, total) {
-        var incorrect = total - correct;
-        var percent = Math.round(correct * 100 / total);
-        screen.innerHTML =
-          '<div class="s-hdr">' +
-            '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 04</span><span class="legend">Result</span></div>' +
-            '<hr class="rule rule--ink">' +
-          '</div>' +
-          '<div class="scroll">' +
-            '<div style="padding:0 16px">' +
-              '<div style="display:flex;align-items:flex-end;gap:8px;margin-top:18px">' +
-                '<span class="count-number" style="font-size:64px">' + pad2(correct) + '</span>' +
-                '<span style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--muted);padding-bottom:6px">of ' + total + '</span>' +
-              '</div>' +
-              '<p style="font-family:var(--serif);font-style:italic;font-size:16px;line-height:1.15;margin:6px 0 0">' + verdictFor(correct, total) + '</p>' +
-              '<hr class="rule rule--ink" style="margin:18px 0 0">' +
-              resultRow('Correct', pad2(correct), 'var(--moss)') +
-              resultRow('Incorrect', pad2(incorrect), 'var(--oxide)') +
-              resultRow('Score', percent + '%', 'var(--ink)') +
-              '<hr class="rule rule--ink" style="margin:0">' +
-            '</div>' +
-          '</div>' +
-          '<div class="foot foot-stack">' +
-            '<button class="cta" data-restart>Restart quiz</button>' +
-            '<button class="btn-ghost" data-close>Close</button>' +
-            '<p class="colophon-line">Nothing is stored · no account · no network</p>' +
-          '</div>';
-
-        screen.querySelector('[data-restart]').addEventListener('click', function () {
-          seed = Math.floor(Math.random() * 1e9);
-          deck = deal(seed);
-          index = 0;
-          answers = deck.map(function () { return -1; });
-          renderQuestion();
-        });
-        screen.querySelector('[data-close]').addEventListener('click', renderWelcome);
-      }
-
-      function resultRow(label, value, colour) {
-        return '<div class="row" style="padding:0"><span class="legend gutter">' + label + '</span>' +
-          '<span class="field" style="text-align:right;color:' + colour + '">' + value + '</span></div>';
-      }
-
-      renderWelcome();
-    }
-  };
-
-  /* =============================================================================
-     05 · CHRONOGRAPH
-     ========================================================================== */
-
-  var CHRONO = {
-    id: 'chrono',
-    number: '05',
-    name: 'Chronograph',
-    spec: 'Task 5 · Java + XML · Handler',
-    edges: [
-      'Elapsed survives a reload',
-      'Start greys out while running',
-      'Lap records a split, does not stop',
-      'Best and worst tagged live',
-      '100 laps scroll without jank'
-    ],
-    mount: function (screen) {
-      var STORE = 'gr.chrono.v3';
-      var state = { accumulated: 0, startedAt: null, laps: [] };
-
-      try {
-        var saved = JSON.parse(localStorage.getItem(STORE));
-        if (saved && typeof saved.accumulated === 'number') {
-          state.accumulated = saved.accumulated;
-          state.startedAt = saved.running ? saved.startedAt : null;
-          state.laps = saved.laps || [];
-        }
-      } catch (e) { /* start clean */ }
-
-      function running() { return state.startedAt !== null; }
-      function elapsed() {
-        return state.accumulated + (running() ? Math.max(0, Date.now() - state.startedAt) : 0);
-      }
-      function persist() {
-        localStorage.setItem(STORE, JSON.stringify({
-          accumulated: running() ? state.accumulated : elapsed(),
-          running: running(),
-          startedAt: state.startedAt,
-          laps: state.laps
-        }));
-      }
-      function stop() {
-        if (!running()) return;
-        state.accumulated = elapsed();
-        state.startedAt = null;
-        persist();
-      }
-
-      function mainTime(ms) {
-        var s = Math.floor(ms / 1000);
-        var hrs = Math.floor(s / 3600), mins = Math.floor((s % 3600) / 60), secs = s % 60;
-        return hrs > 0 ? hrs + ':' + pad2(mins) + ':' + pad2(secs) : pad2(mins) + ':' + pad2(secs);
-      }
-      function frac(ms) { return '.' + pad2(Math.floor((ms % 1000) / 10)); }
-
-      screen.innerHTML =
-        '<div class="s-hdr">' +
-          '<div class="s-masthead"><span class="legend">OIBSIP / Instrument 05</span><span class="legend">Rev 1.0</span></div>' +
-          '<hr class="rule rule--ink">' +
-          '<h3 class="s-title" style="font-size:22px">Chronograph</h3>' +
-          '<p class="s-standfirst" style="font-size:9px">Forty-millisecond resolution, measured from the boot clock rather than the wall clock, so putting the phone down does not lose time.</p>' +
-        '</div>' +
-        '<div class="readout" style="margin:12px 16px 0">' +
-          '<div class="readout-row"><span class="legend">Elapsed</span>' +
-            '<span class="legend"><i class="run-dot" data-dot></i><span data-state>Idle</span></span></div>' +
-          '<p class="chrono-time" data-time>00:00<small>.00</small></p>' +
-          '<hr class="readout-rule">' +
-          '<p class="readout-note" data-last>No lap recorded</p>' +
-        '</div>' +
-        '<div style="padding:16px 16px 0" data-lapzone>' +
-          '<div style="display:flex;justify-content:space-between"><span class="legend">Laps</span><span class="legend" data-lapcount>0 recorded</span></div>' +
-          '<hr class="rule rule--ink" style="margin:7px 0 0">' +
-          '<div class="lap-head" style="padding-left:0;padding-right:0"><span class="legend lap-num">#</span><span class="legend lap-split">Split</span><span class="legend lap-tag"></span><span class="legend lap-total">Total</span></div>' +
-          '<div data-laps style="max-height:150px;overflow-y:auto"></div>' +
-        '</div>' +
-        '<div class="foot foot-stack" style="margin-top:auto">' +
-          '<div class="foot--pair">' +
-            '<button class="cta" data-start>Start</button>' +
-            '<button class="btn-ink" data-stop disabled>Stop</button>' +
-          '</div>' +
-          '<div class="foot--pair">' +
-            '<button class="btn-ghost" data-lap disabled>Lap</button>' +
-            '<button class="btn-ghost" data-reset disabled>Reset</button>' +
+          '<div class="dock">' +
+            '<button class="pill pill--primary pill--block" type="button" data-start>Start the quiz</button>' +
+            '<p class="label" style="text-align:center;text-transform:none;letter-spacing:.02em">No timer. Take your time.</p>' +
           '</div>' +
         '</div>';
 
-      var timeView = screen.querySelector('[data-time]');
-      var stateView = screen.querySelector('[data-state]');
-      var dot = screen.querySelector('[data-dot]');
-      var lastView = screen.querySelector('[data-last]');
-      var lapCount = screen.querySelector('[data-lapcount]');
-      var lapBox = screen.querySelector('[data-laps]');
-      var startBtn = screen.querySelector('[data-start]');
-      var stopBtn = screen.querySelector('[data-stop]');
-      var lapBtn = screen.querySelector('[data-lap]');
-      var resetBtn = screen.querySelector('[data-reset]');
-
-      function paintTime() {
-        var ms = elapsed();
-        timeView.innerHTML = '';
-        timeView.appendChild(document.createTextNode(mainTime(ms)));
-        timeView.appendChild(h('<small>' + frac(ms) + '</small>'));
-      }
-
-      function paintLaps() {
-        var chronological = [];
-        var previous = 0;
-        state.laps.forEach(function (total, i) {
-          chronological.push({ n: i + 1, split: total - previous, total: total });
-          previous = total;
-        });
-        var newestFirst = chronological.slice().reverse();
-
-        var best = -1, worst = -1;
-        if (newestFirst.length >= 2) {
-          best = 0; worst = 0;
-          newestFirst.forEach(function (l, i) {
-            if (l.split < newestFirst[best].split) best = i;
-            if (l.split > newestFirst[worst].split) worst = i;
-          });
-          if (best === worst) worst = -1;
-        }
-
-        lapBox.innerHTML = '';
-        newestFirst.forEach(function (lap, i) {
-          var tag = i === best ? '<span class="lap-tag lap-tag--best">Best</span>'
-                  : (i === worst ? '<span class="lap-tag lap-tag--worst">Worst</span>' : '<span class="lap-tag"></span>');
-          var row = h('<div class="lap" style="padding-left:0;padding-right:0">' +
-            '<span class="legend lap-num">L' + pad2(lap.n) + '</span>' +
-            '<span class="lap-split">' + mainTime(lap.split) + frac(lap.split) + '</span>' +
-            tag +
-            '<span class="lap-total">' + mainTime(lap.total) + frac(lap.total) + '</span></div>');
-          lapBox.appendChild(row);
-        });
-
-        if (!newestFirst.length) {
-          lapBox.appendChild(h('<p class="empty-title" style="font-size:17px;margin-top:12px">No laps yet.</p>' +
-            '<p class="caption" style="margin:6px 0 0">Lap records a split without stopping the clock. Stop freezes the total.</p>'));
-        }
-
-        lapCount.textContent = state.laps.length + ' recorded';
-        if (chronological.length) {
-          var last = chronological[chronological.length - 1];
-          lastView.textContent = 'Last lap ' + mainTime(last.split) + frac(last.split) + ' · total ' + mainTime(last.total) + frac(last.total);
-        } else {
-          lastView.textContent = 'No lap recorded';
-        }
-      }
-
-      function paintControls() {
-        var isRunning = running();
-        var hasTime = elapsed() > 0;
-        startBtn.disabled = isRunning;
-        startBtn.textContent = hasTime ? 'Resume' : 'Start';
-        stopBtn.disabled = !isRunning;
-        lapBtn.disabled = !isRunning;
-        resetBtn.disabled = !hasTime && !state.laps.length;
-        dot.classList.toggle('on', isRunning);
-        stateView.textContent = isRunning ? 'Running' : (hasTime ? 'Paused' : 'Idle');
-      }
-
-      function paintAll() { paintTime(); paintLaps(); paintControls(); }
-
-      startBtn.addEventListener('click', function () {
-        if (running()) return;
-        state.startedAt = Date.now();
-        persist();
-        paintAll();
+      cash(root, '[data-start]').addEventListener('click', function () {
+        deal();
+        renderQuestion();
       });
-      stopBtn.addEventListener('click', function () { stop(); paintAll(); });
-      lapBtn.addEventListener('click', function () {
-        if (!running()) return;
-        state.laps.push(elapsed());
-        persist();
-        paintLaps();
-      });
-      resetBtn.addEventListener('click', function () {
-        state.accumulated = 0;
-        state.startedAt = null;
-        state.laps = [];
-        persist();
-        paintAll();
-      });
-
-      paintAll();
-      setInterval(function () {
-        if (running()) { paintTime(); }
-      }, 40);
     }
-  };
 
-  /* =============================================================================
-     shelf rendering
-     ========================================================================== */
+    function renderQuestion() {
+      view = 'question';
+      var card = deck[index];
+      var answered = answers[index] !== undefined;
+      var chosen = answers[index];
 
-  var INSTRUMENTS = [CONVERTER, LEDGER, CALCULATOR, QUIZ, CHRONO];
-  var shelf = document.querySelector('[data-shelf]');
+      var progress = ((index + (answered ? 1 : 0)) / deck.length) * 100;
 
-  INSTRUMENTS.forEach(function (app) {
-    var article = h(
-      '<article class="instrument" id="i' + app.number + '">' +
-        '<header class="instrument-head">' +
-          '<span class="legend"><span>' + app.number + ' / ' + app.spec + '</span><span>OIBSIP</span></span>' +
-          '<hr class="rule rule--ink">' +
-          '<h3>' + app.name + '</h3>' +
-        '</header>' +
-        '<div class="phone"><div class="screen"></div></div>' +
-        '<ul class="edge-cases">' + app.edges.map(function (e) { return '<li>' + e + '</li>'; }).join('') + '</ul>' +
-      '</article>');
+      root.innerHTML =
+        '<div class="screen-views">' +
+          '<div class="quiz-top">' +
+            '<div style="display:flex;align-items:center">' +
+              '<p class="label" style="flex:1;color:var(--accent-ink)">Question ' + (index + 1) +
+                ' of ' + deck.length + '</p>' +
+              '<button class="iconbtn" type="button" data-quit aria-label="Leave the quiz">' + ICON.close + '</button>' +
+            '</div>' +
+            '<div class="quiz-progress"><span style="width:' + progress + '%"></span></div>' +
+          '</div>' +
+          '<div class="quiz-body">' +
+            '<div class="quiz-question">' + card.prompt + '</div>' +
+            '<div class="options">' + card.options.map(function (text, i) {
+              var cls = 'option';
+              var disabled = '';
+              if (answered) {
+                disabled = ' disabled';
+                if (i === card.correct) { cls += ' is-correct'; }
+                else if (i === chosen) { cls += ' is-wrong'; }
+                else { cls += ' is-muted'; }
+              }
+              return '<button class="' + cls + '" type="button" data-option="' + i + '"' + disabled + '>' +
+                text + '</button>';
+            }).join('') + '</div>' +
+            '<p class="quiz-note" data-note>' + (answered ? 'Why: ' + card.note : 'Pick one answer') + '</p>' +
+          '</div>' +
+          '<div class="dock">' +
+            '<button class="pill pill--primary pill--block" type="button" data-next' +
+              (answered ? '' : ' disabled') + '>' +
+              (index === deck.length - 1 ? 'See results' : 'Next question') + '</button>' +
+          '</div>' +
+        '</div>';
 
-    shelf.appendChild(article);
-    app.mount(article.querySelector('.screen'));
-  });
+      Array.prototype.forEach.call(root.querySelectorAll('[data-option]'), function (button) {
+        button.addEventListener('click', function () {
+          if (answers[index] !== undefined) { return; }
+          answers[index] = Number(button.getAttribute('data-option'));
+          renderQuestion();
+        });
+      });
+
+      cash(root, '[data-next]').addEventListener('click', function () {
+        if (answers[index] === undefined) { return; }
+        if (index < deck.length - 1) {
+          index++;
+          renderQuestion();
+        } else {
+          renderResult();
+        }
+      });
+
+      cash(root, '[data-quit]').addEventListener('click', function () {
+        renderWelcome();
+      });
+    }
+
+    function renderResult() {
+      view = 'result';
+      var correct = deck.reduce(function (sum, card, i) {
+        return sum + (answers[i] === card.correct ? 1 : 0);
+      }, 0);
+      var total = deck.length;
+      var percent = Math.round((correct / total) * 100);
+      var verdict = correct === total ? 'All ten. Nothing left to fix.' :
+        correct / total >= 0.8 ? 'Strong round. A miss or two at most.' :
+        correct / total >= 0.55 ? 'About half. The notes are worth a second read.' :
+        correct / total >= 0.3 ? 'A few landed. Read the notes and run it again.' :
+        'Rough round. Another pass will help.';
+
+      root.innerHTML =
+        '<div class="screen-views" style="justify-content:center">' +
+          '<span class="tile" style="width:54px;height:54px">' + ICON.quiz + '</span>' +
+          '<p class="label" style="margin-top:14px">Your result</p>' +
+          '<div class="score-hero"><span class="score-number">' + correct +
+            '</span><span class="score-of">of ' + total + '</span>' +
+            '<p class="verdict">' + verdict + '</p></div>' +
+          '<div class="card breakdown">' +
+            '<div><div class="n n--good">' + correct + '</div><div class="k">Correct</div></div>' +
+            '<div><div class="n n--bad">' + (total - correct) + '</div><div class="k">Incorrect</div></div>' +
+            '<div><div class="n">' + percent + '%</div><div class="k">Accuracy</div></div>' +
+          '</div>' +
+          '<div class="dock">' +
+            '<button class="pill pill--primary pill--block" type="button" data-again>Play again</button>' +
+            '<button class="pill pill--ghost pill--block" type="button" data-home>Back to start</button>' +
+          '</div>' +
+        '</div>';
+
+      cash(root, '[data-again]').addEventListener('click', function () {
+        deal();
+        renderQuestion();
+      });
+      cash(root, '[data-home]').addEventListener('click', renderWelcome);
+    }
+
+    renderWelcome();
+  }
+
+  /* ================================================================= stopwatch */
+
+  function mountStopwatch(root) {
+    var state = {
+      accumulated: 0,
+      startedAt: 0,
+      running: false,
+      laps: []
+    };
+    var frame = null;
+
+    root.innerHTML =
+      '<header class="app-head">' +
+        '<span class="tile">' + ICON.chrono + '</span>' +
+        '<div><div class="app-title">Stopwatch</div>' +
+        '<div class="app-sub">Hundredths, kept across app switches</div></div>' +
+      '</header>' +
+      '<div class="card watch-card">' +
+        '<div class="watch-state"><span class="dot"></span><span data-state>Ready</span></div>' +
+        '<div class="watch-time" data-time>00:00<span class="frac">.00</span></div>' +
+        '<div class="watch-last" data-last>No laps yet</div>' +
+      '</div>' +
+      '<div class="lap-head"><p class="label">Laps</p><p class="label" data-count></p></div>' +
+      '<div class="laps" data-laps><p class="laps-empty">Laps you record will line up here.</p></div>' +
+      '<div class="watch-controls">' +
+        '<div class="line">' +
+          '<button class="pill pill--primary" type="button" data-start>Start</button>' +
+          '<button class="pill pill--glass" type="button" data-pause disabled>Pause</button>' +
+        '</div>' +
+        '<div class="line">' +
+          '<button class="pill pill--glass" type="button" data-lap disabled>Lap</button>' +
+          '<button class="pill pill--ghost" type="button" data-reset disabled>Reset</button>' +
+        '</div>' +
+      '</div>';
+
+    var timeView = cash(root, '[data-time]');
+    var stateView = cash(root, '[data-state]');
+    var lastView = cash(root, '[data-last]');
+    var countView = cash(root, '[data-count]');
+    var lapsView = cash(root, '[data-laps]');
+    var startButton = cash(root, '[data-start]');
+    var pauseButton = cash(root, '[data-pause]');
+    var lapButton = cash(root, '[data-lap]');
+    var resetButton = cash(root, '[data-reset]');
+    var card = cash(root, '.watch-card');
+
+    function elapsed() {
+      return state.accumulated + (state.running ? performance.now() - state.startedAt : 0);
+    }
+
+    function clockText(ms) {
+      var safe = Math.max(0, ms);
+      var totalSeconds = Math.floor(safe / 1000);
+      var hours = Math.floor(totalSeconds / 3600);
+      var minutes = Math.floor((totalSeconds % 3600) / 60);
+      var seconds = totalSeconds % 60;
+      var hundredths = Math.floor((safe % 1000) / 10);
+      var main = hours > 0
+        ? hours + ':' + pad2(minutes) + ':' + pad2(seconds)
+        : pad2(minutes) + ':' + pad2(seconds);
+      return main + '.' + pad2(hundredths);
+    }
+
+    function shortClock(ms) {
+      var safe = Math.max(0, ms);
+      var totalSeconds = Math.floor(safe / 1000);
+      var hours = Math.floor(totalSeconds / 3600);
+      var minutes = Math.floor((totalSeconds % 3600) / 60);
+      var seconds = totalSeconds % 60;
+      var hundredths = Math.floor((safe % 1000) / 10);
+      var main = hours > 0
+        ? hours + ':' + pad2(minutes) + ':' + pad2(seconds)
+        : pad2(minutes) + ':' + pad2(seconds);
+      return main + '.' + pad2(hundredths);
+    }
+
+    function paintTime() {
+      var text = clockText(elapsed());
+      var cut = text.lastIndexOf('.');
+      timeView.innerHTML = text.slice(0, cut) + '<span class="frac">' + text.slice(cut) + '</span>';
+    }
+
+    function paintLaps() {
+      countView.textContent = state.laps.length === 1 ? '1 lap' : state.laps.length + ' laps';
+
+      if (!state.laps.length) {
+        lapsView.innerHTML = '<p class="laps-empty">Laps you record will line up here.</p>';
+        lastView.textContent = 'No laps yet';
+        return;
+      }
+
+      var chronological = state.laps.slice();
+      var best = -1;
+      var worst = -1;
+      if (chronological.length > 1) {
+        var splits = chronological.map(function (lap) { return lap.split; });
+        best = splits.indexOf(Math.min.apply(null, splits));
+        worst = splits.indexOf(Math.max.apply(null, splits));
+        if (best === worst) { worst = -1; }
+      }
+
+      var newestFirst = chronological.map(function (lap, i) {
+        return { lap: lap, index: i };
+      }).reverse();
+
+      lapsView.innerHTML = newestFirst.map(function (entry) {
+        var tag = '';
+        if (entry.index === best) { tag = '<span class="tag tag--best">Best</span>'; }
+        else if (entry.index === worst) { tag = '<span class="tag tag--worst">Slowest</span>'; }
+        return '<div class="lap">' +
+          '<span class="n">L' + (entry.index + 1) + '</span>' +
+          '<span class="split">' + shortClock(entry.lap.split) + '</span>' +
+          tag +
+          '<span class="total">' + shortClock(entry.lap.total) + '</span>' +
+        '</div>';
+      }).join('');
+
+      var last = chronological[chronological.length - 1];
+      lastView.textContent = 'Last lap ' + shortClock(last.split) + ', total ' + shortClock(last.total);
+    }
+
+    function paintControls() {
+      var running = state.running;
+      var total = elapsed();
+
+      card.classList.toggle('is-running', running);
+      stateView.textContent = running ? 'Running' : (total > 0 ? 'Paused' : 'Ready');
+
+      startButton.disabled = running;
+      startButton.textContent = total > 0 ? 'Resume' : 'Start';
+      pauseButton.disabled = !running;
+      lapButton.disabled = !running;
+      resetButton.disabled = total === 0 && !state.laps.length;
+    }
+
+    function tick() {
+      paintTime();
+      frame = requestAnimationFrame(tick);
+    }
+
+    function start() {
+      if (state.running) { return; }
+      state.running = true;
+      state.startedAt = performance.now();
+      paintControls();
+      frame = requestAnimationFrame(tick);
+    }
+
+    function pause() {
+      if (!state.running) { return; }
+      state.accumulated = elapsed();
+      state.running = false;
+      cancelAnimationFrame(frame);
+      paintTime();
+      paintControls();
+    }
+
+    function reset() {
+      cancelAnimationFrame(frame);
+      state.running = false;
+      state.accumulated = 0;
+      state.startedAt = 0;
+      state.laps = [];
+      paintTime();
+      paintLaps();
+      paintControls();
+    }
+
+    function lap() {
+      if (!state.running) { return; }
+      var total = elapsed();
+      var previous = state.laps.length ? state.laps[state.laps.length - 1].total : 0;
+      state.laps.push({ split: total - previous, total: total });
+      paintLaps();
+      paintControls();
+    }
+
+    startButton.addEventListener('click', start);
+    pauseButton.addEventListener('click', pause);
+    resetButton.addEventListener('click', reset);
+    lapButton.addEventListener('click', lap);
+
+    paintTime();
+    paintLaps();
+    paintControls();
+  }
+
+  /* ================================================================= page bits */
+
+  var toggle = document.getElementById('themeToggle');
+  if (toggle) {
+    toggle.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('oibsip-theme', next); } catch (err) { /* private mode */ }
+    });
+    try {
+      var saved = localStorage.getItem('oibsip-theme');
+      if (saved === 'light' || saved === 'dark') {
+        document.documentElement.setAttribute('data-theme', saved);
+      }
+    } catch (err) { /* nothing to restore */ }
+  }
+
+  bootPhones();
+
+  var revealables = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealables.forEach(function (node) { observer.observe(node); });
+  } else {
+    revealables.forEach(function (node) { node.classList.add('is-in'); });
+  }
 })();

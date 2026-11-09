@@ -1,135 +1,103 @@
-# 03 · Calculator
+# 03 Calculator
 
-**OIBSIP · Android App Development · 2026**
-Part of the [five-instrument set](../README.md). Design language: [Gutter & Rule](../docs/STUDIO.md).
-Build instructions: [BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
+A four function calculator with precedence, a tape line and two error states. Keys fill
+the lower half of the screen, the readout sits above them, and nothing crashes on a fast
+double tap.
 
-A four-function calculator with a real expression model: precedence, chained results, sign toggle,
-percent, delete, and a divide-by-zero state that says what happened instead of crashing.
+Part of the [OIBSIP set](../README.md). Design: [docs/DESIGN.md](../docs/DESIGN.md).
+Build: [docs/BUILD_AND_RUN.md](../docs/BUILD_AND_RUN.md).
 
 | | |
-|---|---|
-| Launcher label | `03 Calculator` |
+| --- | --- |
+| Launcher label | Calculator |
 | Package | `bw.oibsip.calc` |
-| Screen | `MainActivity` (single activity, `GridLayout` keys) |
-| Testable core | `Evaluator` (no Android imports) |
-| Tests | 9 (`EvaluatorTest`) |
+| Screens | `MainActivity` |
+| Logic | `Evaluator`, no Android imports |
+| Tests | 9 in `EvaluatorTest` |
 
-## Screen
+## What it does
 
-```
-OIBSIP / INSTRUMENT 03                            REV 1.0
-──────────────────────────────────────────────────────────
-Calculator
-Four functions, twenty keys. No history, nothing saved.
-┌────────────────────────────────────────────────────────┐
-│ 03 / DISPLAY                       2 + 3 × 4           │
-│                                          14            │  ← the one dominant object
-└────────────────────────────────────────────────────────┘
-  AC    ±     %     ÷
-  7     8     9     ×
-  4     5     6     −        ← 4 × 5 GridLayout, weighted cells, 1 dp rules
-  1     2     3     +
-  0     .    DEL    =        ← oxide key, the only accent on screen
-```
+Digits 0 to 9 and a decimal point, plus, minus, times and divide, equals, C and a
+backspace. There is also a sign key and a percent key, because a calculator without them
+feels incomplete.
 
-## The tape model (why it never crashes)
+The tape above the readout shows the expression as it is built, then the finished
+expression with an equals sign after evaluation. Pressing an operator after a result
+continues from that result.
 
-The expression is **not** a string that gets eval'd. It is a `List<String>` that alternates number,
-operator, number, … plus the operand currently being typed:
+Divide by zero puts `Error` in the readout and `Cannot divide by zero` on the tape. The
+next digit starts a fresh expression. A result too large for a double puts `Error` and
+`Number is out of range` instead.
 
-```
-tokens  = ["12", "×", "4"]      operand = "5"      → tape "12 × 4", readout 5
-press × → tokens become ["12", "×", "4", "×"]       → operator replaced, never doubled
-press = → evaluate(["12", "×", "4", "×"]) after dropping the trailing operator
-```
+## Requirements
 
-That invariant is what makes rapid tapping harmless: a second consecutive operator *replaces* the
-first, a leading operator starts from `0`, and an empty tape returns `0` instead of throwing.
+| Brief line | Where |
+| --- | --- |
+| Digits 0 to 9 and a decimal | `key0` to `key9`, `keyDot` in `activity_main.xml` |
+| Plus, minus, times, divide | `keyAdd`, `keySubtract`, `keyMultiply`, `keyDivide` |
+| Equals | `keyEquals`, `pressEquals()` |
+| C clears | `keyClear`, `pressClear()` |
+| Backspace | `keyDelete` with `ic_backspace`, `pressDelete()` |
+| Divide by zero shows Error | `Evaluator` throws, `enterError()` paints the state |
+| Grid layout | five rows of four weighted keys |
+| No crash on rapid taps | the tape is a token list, so an invalid chain cannot be built |
 
-## Requirements → implementation
+## How the tape works
 
-| Brief line | Implementation |
-|---|---|
-| Display TextView for input and result | `tape` (expression, 12 sp mono) + `result` (autosize 56 → 20 sp) |
-| Digits 0–9 and decimal | 10 digit keys → `pressDigit()`, dot → `pressDot()` (one dot per operand) |
-| + − × ÷ | 4 operator keys → `pressOperator()` |
-| Equals | `pressEquals()` → `Evaluator.evaluate()`, then the result is chained |
-| Clear | `AC` → `pressClear()` |
-| Backspace | `DEL` → `pressDelete()`: pops a digit, then a committed number, then an operator |
-| Division by zero → “Error” | `Evaluator` throws `DIVIDE_BY_ZERO`; the readout shows `ERROR` and the tape says “division by zero” |
-| GridLayout or ConstraintLayout | `GridLayout`, 4 columns × 5 rows, `layout_rowWeight` / `layout_columnWeight` |
-| No crashes on rapid taps | Token guards, 24-token cap, 14-character operand cap, `try/catch` around evaluation, `AC` always available |
+The expression is a `List<String>` that alternates number, operator, number. Typing a
+digit appends to the current operand. Pressing an operator commits the operand and
+appends the operator, or replaces an operator that is already last. Pressing equals drops
+a trailing operator first.
 
-## Evaluation rules
+That structure is why a fast double tap on `+` cannot produce `12 + + 3`. The second tap
+overwrites the last entry instead of appending. There is no string being parsed at the
+end, so there is no parse step to fail.
 
-1. Tokenise into alternating numbers and operators (the model guarantees this).
-2. **Pass one:** fold `×` and `÷` into the number on their left.
-3. **Pass two:** apply `+` and `−` left to right.
-4. Reject division by exactly `0` (and `-0`) with `ArithmeticException("DIVIDE BY ZERO")`.
-5. Reject `NaN` / `Infinity` results as `OUT OF RANGE`.
-
-So `2 + 3 × 4 = 14`, not 20. And `10 − 6 ÷ 3 + 1 = 9`.
-
-## Edge cases handled
-
-| Case | Behaviour |
-|---|---|
-| `8 ÷ 0 =` | Readout `ERROR`, tape “Division by zero · the tape stops here”; any digit or `AC` recovers |
-| 25th token | Further operators are ignored rather than overflowing the tape |
-| `.` pressed twice | Ignored for that operand |
-| `.` first | Becomes `0.` |
-| `12345` then `DEL` | `1,234` — one character, grouping updates |
-| `DEL` after `=` | Clears the finished calculation |
-| `=` with only a number | Returns that number, no error |
-| `=` with a trailing operator | The trailing operator is dropped, then evaluated |
-| Result longer than the panel | Autosize to 20 sp, single line |
-| Very large / very small results | Scientific notation at ≥ 10¹² or < 10⁻⁹ |
-| Rotation | Tape, operand, result, error state all restored |
-| Physical keyboard (desktop emulator) | Digits, `+ - * / x Enter Backspace Esc` are mapped |
+Evaluation runs in two passes. Times and divide fold into the number on their left.
+Then plus and minus run left to right. No expression parser, no recursion, no stack.
 
 ## Files
 
 ```
 app/src/main/java/bw/oibsip/calc/
-├── Evaluator.java     tokenising, two-pass evaluation, formatting, grouping (JVM-testable)
-└── MainActivity.java  tape model, key handling, state, autosized readout
-app/src/main/res/layout/activity_main.xml     GridLayout + ink readout
-app/src/test/java/bw/oibsip/calc/EvaluatorTest.java
+  Evaluator.java     token parsing, two pass evaluation, formatting
+  MainActivity.java  keys, tape state, error states, saved state
+  GlassUi.java
+  GlassApp.java
+app/src/main/res/
+  layout/activity_main.xml   header, readout card, five key rows
+  drawable/                  key shapes, gradient key, icons
+  values/, values-night/     tokens, styles, strings
+app/src/test/java/.../EvaluatorTest.java
 ```
 
-## Run and test
+## Details worth knowing
 
-```bash
-cd Antonio_Task3_Calculator
-./gradlew testDebugUnitTest     # 9 tests
-./gradlew installDebug
+**Grouping.** The readout inserts thousands separators as you type, so `1234567` reads
+`1,234,567`. Grouping applies to the integer part only.
+
+**Scientific notation.** Above 1e12 or below 1e-9 the readout switches to six figure
+scientific notation. `Evaluator.format` handles it in one place so the tape and the
+readout agree.
+
+**Backspace.** It deletes from the operand when there is one. When the operand is empty
+it removes the last token, and if that token was a number it starts editing that number
+instead of throwing it away.
+
+**Errors are a state, not a toast.** An error owns the readout until the next key. That
+is easier to read at arm's length than a message that disappears after two seconds.
+
+**Rotation.** The whole tape, the operand, the result and the error all survive.
+
+## Run it
+
+```
+./gradlew assembleDebug
+adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Demo in 20 seconds
+Tests:
 
-1. `2 + 3 × 4 =` → **14** (prove precedence).
-2. `8 ÷ 0 =` → **ERROR** with the reason on the tape; tap `7` and it recovers.
-3. `1 2 3 4 5 DEL` → `1,234`.
-
-## Viva
-
-**Why not just use `ScriptEngine` or `eval`?**
-Neither exists on Android, and string evaluation invites malformed input. A token list makes the
-invalid states unrepresentable.
-
-**Why two passes instead of a shunting-yard stack?**
-There are no brackets, so two passes give identical results with a fraction of the code. A
-shunting-yard would be the right call the moment parentheses or powers arrive.
-
-**What does `%` do here?**
-Divides the current operand (or the last result) by 100 — the same as most phone calculators. It is
-not “percent of the previous operand”, which is a different, ambiguous convention.
-
-**What happens on rotation mid-expression?**
-`onSaveInstanceState` stores the token list, the operand, the result and the error flag;
-`restore()` puts them back before the first render.
-
-**Where is the memory?**
-There is none, by design — the app has no history and nothing is written to disk. The readme copy
-says so on screen, which is cheaper than a disclaimer.
+```
+./gradlew test
+```

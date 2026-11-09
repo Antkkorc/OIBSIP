@@ -1,78 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">02 Ledger</string>
+    <string name="app_name">Tasks</string>
 
-    <string name="masthead_left">OIBSIP / INSTRUMENT 02</string>
-    <string name="masthead_right">REV 1.0</string>
-
-    <!-- Sign in -->
-    <string name="login_title">The Ledger</string>
-    <string name="login_standfirst">One account, one list, kept on this device. Sign in to pick up where you stopped.</string>
-    <string name="label_email">01 / Email</string>
-    <string name="label_password">02 / Password</string>
-    <string name="hint_email">you@example.com</string>
-    <string name="hint_password">your password</string>
-    <string name="hint_new_password">at least 8 characters</string>
+    <!-- sign in -->
+    <string name="login_title">Welcome back</string>
+    <string name="login_subtitle">Sign in to open your list.</string>
     <string name="sign_in">Sign in</string>
-    <string name="to_register">No account? Register</string>
-    <string name="login_colophon">PBKDF2-SHA256 · 120,000 ITERATIONS · ONE SALT PER ACCOUNT · SESSION IN SHARED PREFERENCES</string>
+    <string name="no_account">New here? Create an account</string>
 
-    <!-- Register -->
-    <string name="register_title">Open an account</string>
-    <string name="register_standfirst">Your name and email live in this app\'s SQLite database. The password is salted and hashed before it is stored, never written as text.</string>
-    <string name="label_name">01 / Name</string>
-    <string name="hint_name">what should the page say</string>
+    <!-- register -->
+    <string name="register_title">Create account</string>
+    <string name="register_subtitle">Each account keeps its own tasks on this phone.</string>
     <string name="create_account">Create account</string>
-    <string name="to_login">Already registered? Sign in</string>
-    <string name="register_colophon">SALTED + HASHED · NOTHING LEAVES THIS PHONE · NO NETWORK PERMISSION</string>
+    <string name="have_account">Already have an account? Sign in</string>
 
-    <!-- Ledger -->
-    <string name="tasks_title">The Ledger</string>
-    <string name="tasks_standfirst">Tasks are keyed to your account and stored in SQLite on this phone.</string>
-    <string name="signed_in_as">Signed in as</string>
-    <string name="log_out">Log out</string>
-    <string name="count_open">Open</string>
-    <string name="count_done">Done</string>
+    <string name="label_name">Name</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Password</string>
+    <string name="label_confirm">Confirm password</string>
+    <string name="hint_name">Your name</string>
+    <string name="hint_email">you@example.com</string>
+    <string name="hint_password">At least 8 characters</string>
+    <string name="hint_confirm">Type it again</string>
+
+    <string name="err_name">Enter your name.</string>
+    <string name="err_email">That email does not look right.</string>
+    <string name="err_password">Use at least 8 characters.</string>
+    <string name="err_confirm">The passwords do not match.</string>
+    <string name="err_taken">That email is already registered.</string>
+    <string name="signing_in">Signing in</string>
+    <string name="creating">Creating</string>
+    <string name="err_login">Email or password is incorrect.</string>
+
+    <!-- tasks -->
+    <string name="tasks_title">Your tasks</string>
+    <string name="counts">%1$d open, %2$d done</string>
+
     <string name="filter_all">All</string>
     <string name="filter_open">Open</string>
     <string name="filter_done">Done</string>
-    <string name="add_entry">Add entry</string>
-    <string name="del">Del</string>
-
-    <!-- Empty states -->
-    <string name="empty_all_title">The ledger is clean.</string>
-    <string name="empty_all_hint">Add the first entry. It stays on this phone.</string>
-    <string name="empty_open_title">Nothing open.</string>
-    <string name="empty_open_hint">Every entry on the page is struck through.</string>
-    <string name="empty_done_title">Nothing finished yet.</string>
-    <string name="empty_done_hint">Tap an entry to strike it through.</string>
-
-    <!-- Add dialog -->
-    <string name="dialog_legend">OIBSIP / LEDGER / NEW ENTRY</string>
-    <string name="dialog_title">Add an entry</string>
-    <string name="dialog_label_title">01 / Task</string>
-    <string name="hint_task">What needs doing?</string>
-    <string name="dialog_label_notes">02 / Notes (optional)</string>
-    <string name="hint_notes">Context, a link, a deadline</string>
-    <string name="cancel">Cancel</string>
-    <string name="add">Add</string>
-
-    <!-- Delete confirm -->
-    <string name="confirm_legend">OIBSIP / LEDGER / DELETE</string>
-    <string name="confirm_title">Delete this entry?</string>
-    <string name="confirm_body">This is permanent. There is no archive, and no undo.</string>
-    <string name="delete">Delete</string>
-
-    <!-- Errors and toasts -->
-    <string name="error_login_empty">Both fields are required.</string>
-    <string name="error_login_failed">No account matches that email and password.</string>
-    <string name="error_name">Enter the name you want on the account.</string>
-    <string name="error_email">That address is missing an @ or a domain.</string>
-    <string name="error_password">Use at least 8 characters. Longer is better than clever.</string>
-    <string name="error_email_taken">An account already exists for that email.</string>
-    <string name="error_task_title">An entry needs a title.</string>
-    <string name="error_session">That session has expired. Sign in again.</string>
-
+    <string name="logout">Log out</string>
+    <string name="add_task">New task</string>
+    <string name="empty_all_title">Nothing here yet</string>
+    <string name="empty_all_body">Tap the plus button to write down the first thing.</string>
+    <string name="empty_open_title">All clear</string>
+    <string name="empty_open_body">Everything on the list is finished.</string>
+    <string name="empty_done_title">Nothing finished</string>
+    <string name="empty_done_body">Tasks show up here once you tick them off.</string>
     <string name="stamp_added">Added</string>
     <string name="stamp_done">Done</string>
+    <string name="task_added">Task added</string>
+    <string name="task_deleted">Task deleted</string>
+    <string name="signed_out">Signed out</string>
+
+    <!-- dialogs -->
+    <string name="dialog_add_title">New task</string>
+    <string name="label_task">Task</string>
+    <string name="label_note">Note (optional)</string>
+    <string name="hint_task">What needs doing?</string>
+    <string name="hint_note">Anything worth remembering</string>
+    <string name="err_title_empty">Give the task a name.</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
+    <string name="delete">Delete</string>
+    <string name="confirm_title">Delete this task?</string>
+    <string name="confirm_body">It leaves your list for good.</string>
+    <string name="task_checked">Task finished</string>
+    <string name="task_reopened">Task reopened</string>
 </resources>
